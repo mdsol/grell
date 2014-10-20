@@ -21,6 +21,12 @@ module Grell
       @collection - visited_pages
     end
 
+    def next_page
+      discovered_pages.sort_by{|page| page.parent_id}.first
+    end
+
+    private
+
     def next_id
       @collection.size
     end
@@ -29,16 +35,6 @@ module Grell
       if @collection.none?{ |collection_page| collection_page.url == page.url}
         @collection.push page
       end
-    end
-
-    def next_page
-      discovered_pages.sort_by{|page| page.parent_id}.first
-    end
-
-    def more_to_crawl?
-      # The first time there is nothing in the arrays but still something to crawl
-      # then whenever visited_pages have anything we need to only look at discovered_pages
-      visited_pages.empty? && discovered_pages.empty? || (!discovered_pages.empty?)
     end
 
   end

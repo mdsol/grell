@@ -43,21 +43,17 @@ module Grell
       @visited
     end
 
+    #TODO: use Capybara for this instead.
     def response
       @response ||= begin
         response = page.driver.network_traffic.last.response_parts.first
-        count = 20
+        count = 50
         while (count > 0 && response.nil?)
-          sleep(0.5)
+          sleep(0.2)
           response = page.driver.network_traffic.last.response_parts.first
         end
         response
       end
-    end
-
-    # handy to peek into what the browser is doing right now
-    def screenshot(name="screenshot")
-      page.driver.render("public/#{name}.jpg",full: true)
     end
 
     private
