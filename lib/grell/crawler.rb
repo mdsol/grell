@@ -1,5 +1,6 @@
 module Grell
 
+  # This is the class that starts and controls the crawling
   class Crawler
     include Capybara::DSL
     attr_reader :collection
@@ -11,7 +12,7 @@ module Grell
     end
 
     def start_crawling(url, &block)
-       site = @collection.create(url, nil)
+      @collection.create(url, nil)
       while !@collection.discovered_pages.empty?
         crawl(@collection.next_page, block)
       end

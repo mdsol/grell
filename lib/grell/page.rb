@@ -1,11 +1,13 @@
 module Grell
+
+  #This class contains the logic related to work with each page we crawl
   class Page
-    include Capybara::DSL
 
     attr_reader :url, :timestamp, :links, :status, :headers, :body, :id, :parent_id
     attr_accessor :visited
 
     def initialize(url, id, parent_id)
+      @rawpage = RawPage.new
       @url = url
       @links = []
       @id = id
@@ -18,13 +20,13 @@ module Grell
     end
 
     def navigate
-      if(visit(@url)["status"] == "success")
+      if(@rawpage.navigate(@url))
         @visited = true
         @timestamp = Time.now
         @links = all_links
-        @status = response.status
+        @status = @rawpage.response.status
         @headers = format_headers
-        @body = page.body
+        @body = @rawpage.body
       else
         @visited = true
         @timestamp = Time.now
@@ -36,7 +38,7 @@ module Grell
     end
 
     def host
-      page.current_host
+      @rawpage.host
     end
 
     def visited?
@@ -46,11 +48,11 @@ module Grell
     #TODO: use Capybara for this instead.
     def response
       @response ||= begin
-        response = page.driver.network_traffic.last.response_parts.first
+        response = @rawpage.response
         count = 50
         while (count > 0 && response.nil?)
           sleep(0.2)
-          response = page.driver.network_traffic.last.response_parts.first
+          response = @rawpage.response
         end
         response
       end
@@ -59,7 +61,7 @@ module Grell
     private
 
     def all_links
-      unique_links = all('a', visible: false).map { |a| a[:href] }.uniq.compact
+      unique_links = @rawpage.all_links.map { |a| a[:href] }.uniq.compact
       only_path_links = unique_links.select do |link|
         uri = URI.parse(link)
         uri.host.nil? && !uri.path.nil? && !uri.path.empty?
@@ -68,7 +70,7 @@ module Grell
     end
 
     def format_headers
-      response.headers.inject({}) do |result_hash, one_header_hash|
+      @rawpage.response.headers.inject({}) do |result_hash, one_header_hash|
         current_name = one_header_hash['name']
         current_value =  one_header_hash['value']
         result_hash[current_name] = current_value
