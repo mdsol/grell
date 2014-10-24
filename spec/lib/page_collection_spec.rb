@@ -1,8 +1,8 @@
 
 RSpec.describe Grell::PageCollection do
+  let(:collection) {Grell::PageCollection.new('http://www.trusmis.com')}
 
   context 'empty collection' do
-    let(:collection) {Grell::PageCollection.new}
 
     it 'has no visited pages' do
       expect(collection.visited_pages).to be_empty
@@ -18,8 +18,7 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'one unvisited page' do
-    let(:collection) {Grell::PageCollection.new}
-    let(:page) {collection.create('url', 0)}
+    let(:page) {collection.create_page('url', 0)}
     before do
       page.visited = false
     end
@@ -39,8 +38,7 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'one visited page' do
-    let(:collection) {Grell::PageCollection.new}
-    let(:page) {collection.create('url', 0)}
+    let(:page) {collection.create_page('url', 0)}
     before do
       page.visited = true
     end
@@ -59,9 +57,8 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'one visited and one unvisited page with the same url' do
-    let(:collection) {Grell::PageCollection.new}
-    let(:page) {collection.create('url', 0)}
-    let(:unvisited)  {collection.create('url', 0)}
+    let(:page) {collection.create_page('url', 0)}
+    let(:unvisited)  {collection.create_page('url', 0)}
     before do
       page.visited = true
       unvisited.visited = false
@@ -89,9 +86,8 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'one visited and one unvisited page with different URLs' do
-    let(:collection) {Grell::PageCollection.new}
-    let(:page) {collection.create('url', 0)}
-    let(:unvisited)  {collection.create('url2', 0)}
+    let(:page) {collection.create_page('url', 0)}
+    let(:unvisited)  {collection.create_page('url2', 0)}
     before do
       page.visited = true
       unvisited.visited = false
@@ -111,9 +107,8 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'several unvisited pages' do
-    let(:collection) {Grell::PageCollection.new}
-    let(:page) {collection.create('url', 2)}
-    let(:page2) {collection.create('url2', 0)}
+    let(:page) {collection.create_page('url', 2)}
+    let(:page2) {collection.create_page('url2', 0)}
     before do
       page.visited = false
       page2.visited = false

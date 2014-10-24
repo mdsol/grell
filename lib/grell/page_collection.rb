@@ -2,13 +2,14 @@ module Grell
   class PageCollection
     attr_reader :collection
 
-    def initialize
+    def initialize(host)
       @collection = []
+      @host = host
     end
 
-    def create(url, parent_id)
+    def create_page(url, parent_id)
       page_id = next_id
-      page = Page.new(url, page_id, parent_id)
+      page = Page.new(@host, url, page_id, parent_id)
       add(page)
       page
     end

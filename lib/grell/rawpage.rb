@@ -5,7 +5,6 @@ module Grell
     include Capybara::DSL
 
     def navigate(url)
-      byebug
       result = visit(url)
       result && result['status'] == "success"
     end

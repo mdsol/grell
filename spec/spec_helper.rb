@@ -1,6 +1,8 @@
 require 'grell'
 require 'webmock/rspec'
 
+WebMock.disable_net_connect!
+
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
 
@@ -33,6 +35,9 @@ RSpec.configure do |config|
 
   config.order = :random
   Kernel.srand config.seed
+
+  Capybara.javascript_driver = :poltergeist_billy
+  Capybara.default_driver = :poltergeist_billy
 
 #  config.profile_examples = 10
 end

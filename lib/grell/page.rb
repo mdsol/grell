@@ -6,8 +6,9 @@ module Grell
     attr_reader :url, :timestamp, :links, :status, :headers, :body, :id, :parent_id
     attr_accessor :visited
 
-    def initialize(url, id, parent_id)
+    def initialize(host, url, id, parent_id)
       @rawpage = RawPage.new
+      @host = host
       @url = url
       @links = []
       @id = id
@@ -24,17 +25,16 @@ module Grell
         @visited = true
         @timestamp = Time.now
         @links = all_links
-        @status = @rawpage.response.status
+        @status = response.status
         @headers = format_headers
         @body = @rawpage.body
       else
-        @visited = true
-        @timestamp = Time.now
-        @links =  []
-        @status = nil
-        @headers = []
-        @body = ''
+        unavailable_page(nil)
       end
+    rescue URI::InvalidURIError
+      unavailable_page(404)
+    Capybara::Poltergeist::TimeoutError
+      unavailable_page(404)
     end
 
     def host
@@ -60,17 +60,49 @@ module Grell
 
     private
 
+    def unavailable_page(status)
+      @visited = true
+      @timestamp = Time.now
+      @links =  []
+      @status = status
+      @headers = []
+      @body = ''
+    end
+
     def all_links
       unique_links = @rawpage.all_links.map { |a| a[:href] }.uniq.compact
-      only_path_links = unique_links.select do |link|
-        uri = URI.parse(link)
-        uri.host.nil? && !uri.path.nil? && !uri.path.empty?
+      unique_links.map { |link| link_to_url(link) }.compact #valid_link?(link) }
+    rescue Capybara::Poltergeist::ObsoleteNode
+      Log.error "We found an obsolete node in #{@url}. Ignoring all links"
+      # Sometimes Javascript and timing may screw this, we lose these links.
+      # TODO: Can we do something more intelligent here?
+      []
+    end
+
+    # We only accept links in this same host for now
+    def link_to_url(link)
+      uri = URI.parse(link)
+      if uri.host.nil?
+        if uri.path
+          if uri.path.start_with?('/')
+            @host + link
+          else #links like href="google.com" the browser would go to http://google.com like "http://#{link}"
+            Log.error "GRELL Bad formatted link: #{link}, assuming external"
+            nil
+          end
+        else
+          Log.error "GRELL does not follow links without host or path: #{uri}"
+          nil  #empty strings? can that happen?
+         end
+      else
+        nil #We avoid links outside our domain for now
       end
-      only_path_links
+    rescue URI::InvalidURIError #We will have invalid links propagating till we navigate to them
+      link
     end
 
     def format_headers
-      @rawpage.response.headers.inject({}) do |result_hash, one_header_hash|
+      response.headers.inject({}) do |result_hash, one_header_hash|
         current_name = one_header_hash['name']
         current_value =  one_header_hash['value']
         result_hash[current_name] = current_value
