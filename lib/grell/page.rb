@@ -33,7 +33,7 @@ module Grell
       end
     rescue URI::InvalidURIError
       unavailable_page(404)
-    Capybara::Poltergeist::TimeoutError
+    rescue Capybara::Poltergeist::TimeoutError
       unavailable_page(404)
     end
 

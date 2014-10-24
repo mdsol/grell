@@ -33,9 +33,18 @@ module Grell
     end
 
     def add(page)
-      if @collection.none?{ |collection_page| collection_page.url == page.url}
+      new_url = @collection.none? do |collection_page|
+        url_to_path(collection_page.url) == url_to_path(page.url)
+      end
+      if new_url
         @collection.push page
       end
+    end
+
+    def url_to_path(url)
+      URI.parse(url).path
+    rescue URI::InvalidURIError
+      nil
     end
 
   end
