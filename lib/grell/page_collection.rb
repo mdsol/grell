@@ -43,8 +43,8 @@ module Grell
 
     def url_to_path(url)
       URI.parse(url).path
-    rescue URI::InvalidURIError
-      nil
+    rescue URI::InvalidURIError #Invalid URLs will be added and cought when we try to navigate to them
+      url
     end
 
   end

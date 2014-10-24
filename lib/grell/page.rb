@@ -73,7 +73,7 @@ module Grell
       unique_links = @rawpage.all_links.map { |a| a[:href] }.uniq.compact
       unique_links.map { |link| link_to_url(link) }.compact #valid_link?(link) }
     rescue Capybara::Poltergeist::ObsoleteNode
-      Log.error "We found an obsolete node in #{@url}. Ignoring all links"
+      Log.warning "We found an obsolete node in #{@url}. Ignoring all links"
       # Sometimes Javascript and timing may screw this, we lose these links.
       # TODO: Can we do something more intelligent here?
       []
@@ -87,11 +87,11 @@ module Grell
           if uri.path.start_with?('/')
             @host + link
           else #links like href="google.com" the browser would go to http://google.com like "http://#{link}"
-            Log.error "GRELL Bad formatted link: #{link}, assuming external"
+            Log.info "GRELL Bad formatted link: #{link}, assuming external"
             nil
           end
         else
-          Log.error "GRELL does not follow links without host or path: #{uri}"
+          Log.info "GRELL does not follow links without host or path: #{uri}"
           nil  #empty strings? can that happen?
          end
       else
