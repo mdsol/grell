@@ -6,9 +6,8 @@ module Grell
     attr_reader :url, :timestamp, :links, :status, :headers, :body, :id, :parent_id
     attr_accessor :visited
 
-    def initialize(host, url, id, parent_id)
+    def initialize( url, id, parent_id)
       @rawpage = RawPage.new
-      @host = host
       @url = url
       @links = []
       @id = id
@@ -58,6 +57,12 @@ module Grell
       end
     end
 
+    def path
+      URI.parse(@url).path
+    rescue URI::InvalidURIError #Invalid URLs will be added and cought when we try to navigate to them
+      @url
+    end
+
     private
 
     def unavailable_page(status)
@@ -71,7 +76,7 @@ module Grell
 
     def all_links
       unique_links = @rawpage.all_links.map { |a| a[:href] }.uniq.compact
-      unique_links.map { |link| link_to_url(link) }.compact #valid_link?(link) }
+      unique_links.map { |link| link_to_url(link) }.compact
     rescue Capybara::Poltergeist::ObsoleteNode
       Log.warning "We found an obsolete node in #{@url}. Ignoring all links"
       # Sometimes Javascript and timing may screw this, we lose these links.
@@ -79,24 +84,22 @@ module Grell
       []
     end
 
-    # We only accept links in this same host for now
+    # We only accept links in this same host that start with a path
+    # nil from this
     def link_to_url(link)
       uri = URI.parse(link)
-      if uri.host.nil?
-        if uri.path
-          if uri.path.start_with?('/')
-            @host + link
-          else #links like href="google.com" the browser would go to http://google.com like "http://#{link}"
-            Log.info "GRELL Bad formatted link: #{link}, assuming external"
-            nil
-          end
-        else
-          Log.info "GRELL does not follow links without host or path: #{uri}"
-          nil  #empty strings? can that happen?
-         end
-      else
-        nil #We avoid links outside our domain for now
+      return nil if uri.host && uri.host != host #We do not want other host being defined
+      if uri.path.nil?
+        Log.info "GRELL does not follow links without a path: #{uri}"
+        return nil
       end
+      if uri.path.start_with?('/')
+        host + link  #convert to full URL
+      else #links like href="google.com" the browser would go to http://google.com like "http://#{link}"
+        Log.info "GRELL Bad formatted link: #{link}, assuming external"
+        nil
+      end
+
     rescue URI::InvalidURIError #We will have invalid links propagating till we navigate to them
       link
     end

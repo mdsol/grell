@@ -1,24 +1,19 @@
 require 'byebug'
 
-require 'rack'
-require 'rack/server'
-require 'billy/rspec'
-
-
 RSpec.describe Grell::Page do
 
   let(:page_id) { rand(10).floor + 10}
   let(:parent_page_id) {rand(10).floor}
-  let(:page) {Grell::Page.new(host, url, page_id, parent_page_id)}
+  let(:page) {Grell::Page.new(url, page_id, parent_page_id)}
   let(:host) {"http://www.example.com"}
   let(:url) {"http://www.example.com/test"}
 
-  it "gives access to the host" do
-#    expect(page.host).to eq(host)
-  end
-
   it "gives access to the url" do
     expect(page.url).to eq(url)
+  end
+
+  it 'gives access to the path' do
+    expect(page.path).to eq('/test')
   end
 
   it "gives access to the page id" do

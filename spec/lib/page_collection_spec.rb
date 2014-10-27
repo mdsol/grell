@@ -1,6 +1,6 @@
 
 RSpec.describe Grell::PageCollection do
-  let(:collection) {Grell::PageCollection.new('http://www.trusmis.com')}
+  let(:collection) {Grell::PageCollection.new}
 
   context 'empty collection' do
 

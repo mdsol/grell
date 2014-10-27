@@ -2,14 +2,13 @@ module Grell
   class PageCollection
     attr_reader :collection
 
-    def initialize(host)
+    def initialize
       @collection = []
-      @host = host
     end
 
     def create_page(url, parent_id)
       page_id = next_id
-      page = Page.new(@host, url, page_id, parent_id)
+      page = Page.new(url, page_id, parent_id)
       add(page)
       page
     end
@@ -34,17 +33,11 @@ module Grell
 
     def add(page)
       new_url = @collection.none? do |collection_page|
-        url_to_path(collection_page.url) == url_to_path(page.url)
+        collection_page.path == page.path
       end
       if new_url
         @collection.push page
       end
-    end
-
-    def url_to_path(url)
-      URI.parse(url).path
-    rescue URI::InvalidURIError #Invalid URLs will be added and cought when we try to navigate to them
-      url
     end
 
   end
