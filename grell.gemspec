@@ -23,6 +23,8 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.7"
   spec.add_development_dependency "byebug", "~> 3.5"
+  spec.add_development_dependency "kender"
+  spec.add_development_dependency "rake"
   spec.add_development_dependency "webmock", '~> 1.18'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'puffing-billy', '~> 0.2.3'
