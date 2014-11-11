@@ -20,7 +20,7 @@ require 'byebug'
       page.body
     end
 
-    def all_links
+    def all_anchors
       all('a', visible: false)
     end
 

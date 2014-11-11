@@ -61,7 +61,7 @@ module Grell
     private
 
     def unavailable_page(status)
-      puts "RAsised exception"
+      Log.warn "The page with the URL #{@url} was not available"
       @visited = true
       @timestamp = Time.now
       @links =  []
@@ -71,7 +71,7 @@ module Grell
     end
 
     def all_links
-      unique_links = @rawpage.all_links.map { |a| a[:href] }.uniq.compact
+      unique_links = @rawpage.all_anchors.map { |a| a[:href] }.uniq.compact
       unique_links.map { |link| link_to_url(link) }.compact
     rescue Capybara::Poltergeist::ObsoleteNode
       Log.warn "We found an obsolete node in #{@url}. Ignoring all links"

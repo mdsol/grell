@@ -8,7 +8,7 @@ RSpec.describe Grell::Crawler do
   let(:crawler) { Grell::Crawler.new(external_driver: true)}
   let(:body) {'body'}
 
-  before(:each) do
+  before do
     proxy.stub(url).and_return(body: body, code: 200)
   end
 
