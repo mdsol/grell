@@ -1,16 +1,19 @@
 module Grell
-
+require 'byebug'
   # This class depends heavily on Capybara but contains no logic.
   class RawPage
     include Capybara::DSL
 
     def navigate(url)
-      result = visit(url)
-      result && result['status'] == "success"
+      visit(url)
     end
 
-    def response
-      page.driver.network_traffic.last.response_parts.first
+    def headers
+      page.response_headers
+    end
+
+    def status
+      page.status_code
     end
 
     def body

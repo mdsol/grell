@@ -7,6 +7,7 @@ RSpec.describe Grell::Page do
   let(:page) {Grell::Page.new(url, page_id, parent_page_id)}
   let(:host) {"http://www.example.com"}
   let(:url) {"http://www.example.com/test"}
+  let(:returned_headers)  { { 'Other-Header' => 'yes', 'Content-Type' => 'text/html' }}
 
   it "gives access to the url" do
     expect(page.url).to eq(url)
@@ -34,6 +35,10 @@ RSpec.describe Grell::Page do
       expect(page.body).to eq(body)
     end
 
+    it 'has correct headers' do
+      expect(page.headers).to include(headers)
+    end
+
     it 'has the correct links' do
       expect(page.links).to eq(links)
     end
@@ -47,8 +52,13 @@ RSpec.describe Grell::Page do
   context 'we have not yet navigated to the page' do
     let(:visited) {false}
     let(:status) {nil}
-    let(:body) {nil}
+    let(:body) {''}
     let(:links) {[]}
+    let(:headers) {{}}
+
+    before do
+      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers)
+    end
 
     it_behaves_like 'a grell page'
 
@@ -59,9 +69,10 @@ RSpec.describe Grell::Page do
     let(:status) { 404}
     let(:body) {'<html><head></head><body>nothing cool</body></html>'}
     let(:links) {[]}
+    let(:headers) {returned_headers}
 
     before do
-      proxy.stub(url).and_return(body: body, code: status)
+      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers)
       page.navigate
     end
 
@@ -74,9 +85,10 @@ RSpec.describe Grell::Page do
     let(:status) { 200}
     let(:body) {'<html><head></head><body>nothing cool</body></html>'}
     let(:links) {[]}
+    let(:headers) {returned_headers}
 
     before do
-      proxy.stub(url).and_return(body: body, code: status)
+      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers)
       page.navigate
     end
 
@@ -95,9 +107,10 @@ RSpec.describe Grell::Page do
       </body></html>"
     end
     let(:links) {["http://www.example.com/trusmis.html", "http://www.example.com/help.html"]}
+    let(:headers) {returned_headers}
 
     before do
-      proxy.stub(url).and_return(body: body, code: status)
+      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers)
       page.navigate
     end
 

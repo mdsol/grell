@@ -3,7 +3,7 @@ module Grell
   #This class contains the logic related to work with each page we crawl
   class Page
 
-    attr_reader :url, :timestamp, :links, :status, :headers, :body, :id, :parent_id
+    attr_reader :url, :timestamp, :links, :id, :parent_id, :rawpage
     attr_accessor :visited
 
     def initialize( url, id, parent_id)
@@ -13,27 +13,35 @@ module Grell
       @id = id
       @parent_id = parent_id
       @visited = false
-      @status = nil
-      @body = nil
       @timestamp = nil
-      @headers = nil
     end
 
     def navigate
-      if(@rawpage.navigate(@url))
-        @visited = true
-        @timestamp = Time.now
-        @links = all_links
-        @status = response.status
-        @headers = format_headers
-        @body = @rawpage.body
-      else
-        unavailable_page(nil)
+      # We wait a maximum of 10 seconds to get an HTML page. We try or best to workaround inconsistencies on poltergeist
+      Reader.wait_for(->{@rawpage.navigate(url)}, 10, 0.5) do
+        !headers.empty? &&  headers["Content-Type"] && headers["Content-Type"].include?('text/html').equal?(true)
       end
+      @visited = true
+      @timestamp = Time.now
+      @links = all_links
     rescue URI::InvalidURIError
       unavailable_page(404)
     rescue Capybara::Poltergeist::TimeoutError
       unavailable_page(404)
+    end
+
+    def headers
+      return {} unless @visited
+      @rawpage.headers
+    end
+
+    def body
+      return '' unless @visited
+      @rawpage.body
+    end
+    def status
+      return nil unless @visited
+      @rawpage.status
     end
 
     def host
@@ -42,19 +50,6 @@ module Grell
 
     def visited?
       @visited
-    end
-
-    #TODO: use Capybara for this instead.
-    def response
-      @response ||= begin
-        response = @rawpage.response
-        count = 50
-        while (count > 0 && response.nil?)
-          sleep(0.2)
-          response = @rawpage.response
-        end
-        response
-      end
     end
 
     def path
@@ -66,11 +61,12 @@ module Grell
     private
 
     def unavailable_page(status)
+      puts "RAsised exception"
       @visited = true
       @timestamp = Time.now
       @links =  []
       @status = status
-      @headers = []
+      @headers = {}
       @body = ''
     end
 
@@ -78,7 +74,7 @@ module Grell
       unique_links = @rawpage.all_links.map { |a| a[:href] }.uniq.compact
       unique_links.map { |link| link_to_url(link) }.compact
     rescue Capybara::Poltergeist::ObsoleteNode
-      Log.warning "We found an obsolete node in #{@url}. Ignoring all links"
+      Log.warn "We found an obsolete node in #{@url}. Ignoring all links"
       # Sometimes Javascript and timing may screw this, we lose these links.
       # TODO: Can we do something more intelligent here?
       []
@@ -103,16 +99,6 @@ module Grell
     rescue URI::InvalidURIError #We will have invalid links propagating till we navigate to them
       link
     end
-
-    def format_headers
-      response.headers.inject({}) do |result_hash, one_header_hash|
-        current_name = one_header_hash['name']
-        current_value =  one_header_hash['value']
-        result_hash[current_name] = current_value
-        result_hash
-      end
-    end
-
 
   end
 
