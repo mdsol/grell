@@ -24,9 +24,11 @@ module Grell
       @visited = true
       @timestamp = Time.now
       @links = all_links
-    rescue URI::InvalidURIError
+    rescue Capybara::Poltergeist::BrowserError #This may happen internally on Poltergeist, they claim is a bug.
       unavailable_page(404)
-    rescue Capybara::Poltergeist::TimeoutError
+    rescue URI::InvalidURIError #No cool URL means we report error
+      unavailable_page(404)
+    rescue Capybara::Poltergeist::TimeoutError #Poltergeist has its own timeout which is similar to Chromes.
       unavailable_page(404)
     end
 
