@@ -33,8 +33,10 @@ module Grell
     end
 
     def headers
-      return {} unless @visited
+      return {grell_status: 'NotVisited' } unless @visited
       @rawpage.headers
+    rescue Capybara::Poltergeist::BrowserError #This may happen internally on Poltergeist, they claim is a bug.
+      { grell_status: 'BrowserError'}
     end
 
     def body
