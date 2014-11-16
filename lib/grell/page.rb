@@ -43,9 +43,15 @@ module Grell
       return '' unless @visited
       @rawpage.body
     end
+
     def status
       return nil unless @visited
       @rawpage.status
+    end
+
+    def has_selector?(selector)
+      return false unless @visited
+      @rawpage.has_selector?(selector)
     end
 
     def host
