@@ -27,5 +27,9 @@ require 'byebug'
     def host
       page.current_host
     end
+
+    def has_selector?(selector)
+      page.has_selector?(selector)
+    end
   end
 end
