@@ -1,5 +1,4 @@
 module Grell
-require 'byebug'
   # This class depends heavily on Capybara but contains no logic.
   class RawPage
     include Capybara::DSL
