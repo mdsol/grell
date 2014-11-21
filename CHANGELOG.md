@@ -1,3 +1,3 @@
-* Version 0.0.1
+* Version 1.0
   Initial implementation
   Basic support to crawling pages.
