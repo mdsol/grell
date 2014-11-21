@@ -8,8 +8,14 @@ require 'rack/server'
 
 WebMock.disable_net_connect!
 
+
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
+
+  # We do not need to wait for pages to return all the data
+  config.before do
+    stub_const("Grell::Page::WAIT_TIME", 0)
+  end
 
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true

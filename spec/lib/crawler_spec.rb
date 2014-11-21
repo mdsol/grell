@@ -14,9 +14,12 @@ RSpec.describe Grell::Crawler do
 
   context '#crawl' do
     it 'yields the result if a block is given' do
-      block = Proc.new {|n| n }
-      expect(block).to receive(:call).with(page)
+      result = []
+      block = Proc.new {|n| result.push(n) }
       crawler.crawl(page, block)
+      expect(result.size).to eq(1)
+      expect(result.first.url).to eq(url)
+      expect(result.first.visited).to eq(true)
     end
 
     it 'logs interesting information' do
@@ -26,10 +29,26 @@ RSpec.describe Grell::Crawler do
   end
 
   context '#start_crawling' do
+    let(:body) do
+      <<-EOS
+      <html><head></head><body>
+      <a href="/musmis.html">trusmis</a>
+      Hello world!
+      </body></html>
+      EOS
+    end
+    let(:url_visited) {"http://www.example.com/musmis.html"}
+    before do
+      proxy.stub(url_visited).and_return(body: 'body', code: 200)
+    end
+
     it 'calls the block we used to start_crawling' do
-      block = Proc.new {|n| n }
-      expect(block).to receive(:call)
+      result = []
+      block = Proc.new {|n| result.push(n) }
       crawler.start_crawling(url, &block)
+      expect(result.size).to eq(2)
+      expect(result[0].url).to eq(url)
+      expect(result[1].url).to eq(url_visited)
     end
   end
 

@@ -3,6 +3,9 @@ module Grell
   #This class contains the logic related to work with each page we crawl
   class Page
 
+    WAIT_TIME = 10
+    WAIT_INTERVAL = 0.5
+
     attr_reader :url, :timestamp, :links, :id, :parent_id, :rawpage
     attr_accessor :visited
 
@@ -18,7 +21,7 @@ module Grell
 
     def navigate
       # We wait a maximum of 10 seconds to get an HTML page. We try or best to workaround inconsistencies on poltergeist
-      Reader.wait_for(->{@rawpage.navigate(url)}, 10, 0.5) do
+      Reader.wait_for(->{@rawpage.navigate(url)}, WAIT_TIME, WAIT_INTERVAL ) do
         !headers.empty? &&  headers["Content-Type"] && headers["Content-Type"].include?('text/html').equal?(true)
       end
       @visited = true
