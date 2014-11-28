@@ -20,9 +20,10 @@ module Grell
     end
 
     def navigate
-      # We wait a maximum of 10 seconds to get an HTML page. We try or best to workaround inconsistencies on poltergeist
+      # We wait a maximum of WAIT_TIME seconds to get an HTML page. We try or best to workaround inconsistencies on poltergeist
       Reader.wait_for(->{@rawpage.navigate(url)}, WAIT_TIME, WAIT_INTERVAL ) do
-        !headers.empty? &&  headers["Content-Type"] && headers["Content-Type"].include?('text/html').equal?(true)
+        @rawpage.status && !@rawpage.headers.empty? &&
+          @rawpage.headers["Content-Type"] && @rawpage.headers["Content-Type"].include?('text/html').equal?(true)
       end
       @visited = true
       @timestamp = Time.now
