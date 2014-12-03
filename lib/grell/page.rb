@@ -28,6 +28,8 @@ module Grell
       @visited = true
       @timestamp = Time.now
       @links = all_links
+    rescue Capybara::Poltergeist::JavascriptError
+      unavailable_page(404)
     rescue Capybara::Poltergeist::BrowserError #This may happen internally on Poltergeist, they claim is a bug.
       unavailable_page(404)
     rescue URI::InvalidURIError #No cool URL means we report error
