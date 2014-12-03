@@ -1,5 +1,5 @@
 * Version 1.0.1
-  Recueing Javascript errors
+  Rescueing Javascript errors
 
 * Version 1.0
   Initial implementation
