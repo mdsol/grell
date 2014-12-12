@@ -19,6 +19,10 @@ Or install it yourself as:
 
     $ gem install grell
 
+Grell uses PhantomJS, you will need to download and install it in your
+system. Check for instructions in http://phantomjs.org/
+Grell has been tested with PhantomJS v1.9.x
+
 ## Usage
 
 
