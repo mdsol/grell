@@ -36,7 +36,7 @@ RSpec.describe Grell::Page do
     end
 
     it 'has correct headers' do
-      expect(page.headers).to include(headers)
+      expect(page.headers).to include(expected_headers)
     end
 
     it 'has the correct links' do
@@ -54,10 +54,10 @@ RSpec.describe Grell::Page do
     let(:status) {nil}
     let(:body) {''}
     let(:links) {[]}
-    let(:headers) {{}}
+    let(:expected_headers) {{}}
 
     before do
-      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers)
+      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers.dup)
     end
 
     it_behaves_like 'a grell page'
@@ -69,10 +69,10 @@ RSpec.describe Grell::Page do
     let(:status) { 404}
     let(:body) {'<html><head></head><body>nothing cool</body></html>'}
     let(:links) {[]}
-    let(:headers) {returned_headers}
+    let(:expected_headers) {returned_headers}
 
     before do
-      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers)
+      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers.dup)
       page.navigate
     end
 
@@ -85,10 +85,10 @@ RSpec.describe Grell::Page do
     let(:status) { 200}
     let(:body) {'<html><head></head><body>nothing cool</body></html>'}
     let(:links) {[]}
-    let(:headers) {returned_headers}
+    let(:expected_headers) {returned_headers}
 
     before do
-      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers)
+      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers.dup)
       page.navigate
     end
 
@@ -107,10 +107,10 @@ RSpec.describe Grell::Page do
       </body></html>"
     end
     let(:links) {["http://www.example.com/trusmis.html", "http://www.example.com/help.html"]}
-    let(:headers) {returned_headers}
+    let(:expected_headers) {returned_headers}
 
     before do
-      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers)
+      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers.dup)
       page.navigate
     end
 
