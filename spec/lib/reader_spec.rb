@@ -30,8 +30,8 @@ RSpec.describe Grell::Reader do
     let(:waiting_time) {2}
     let(:sleeping_time) {3}
     let(:condition) {false}
-    before do
-      allow(Time).to receive(:now).and_return(1, 1, 4)
+    before(:each) do
+      allow(Grell::Reader).to receive(:current_time).and_return(1, 1, 4)
     end
 
     it 'waits the waiting time' do
@@ -42,5 +42,4 @@ RSpec.describe Grell::Reader do
     end
 
   end
-
 end

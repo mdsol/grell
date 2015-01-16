@@ -5,7 +5,6 @@ require 'billy/rspec'
 require 'rack'
 require 'rack/server'
 
-
 WebMock.disable_net_connect!
 
 
