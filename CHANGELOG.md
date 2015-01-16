@@ -1,3 +1,6 @@
+* Develop
+  solve problem with randomly failing spec
+
 * Version 1.0.1
   Rescueing Javascript errors
 
