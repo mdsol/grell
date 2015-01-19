@@ -10,5 +10,6 @@ module Grell
         sleep(sleeping_time)
       end
     end
+
   end
 end

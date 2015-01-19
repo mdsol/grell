@@ -5,6 +5,13 @@ require 'billy/rspec'
 require 'rack'
 require 'rack/server'
 
+# This will trick Puffing-billy into using this logger instead of its own
+# Puffing billy is very noisy and we do not want to see that in our output
+class Rails
+  def self.logger
+    Logger.new(nil)
+  end
+end
 
 WebMock.disable_net_connect!
 
