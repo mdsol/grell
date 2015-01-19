@@ -22,23 +22,21 @@ RSpec.describe Grell::Reader do
       Grell::Reader.wait_for(->{''}, waiting_time, sleeping_time) do
         condition
       end
-      expect(Time.now - before_time < 1)
+      expect(Time.now - before_time).to be < 1
     end
   end
 
   context 'The condition is false' do
-    let(:waiting_time) {2}
-    let(:sleeping_time) {3}
+    let(:waiting_time) {0.2}
+    let(:sleeping_time) {0.2}
     let(:condition) {false}
-    before(:each) do
-      allow(Grell::Reader).to receive(:current_time).and_return(1, 1, 4)
-    end
 
     it 'waits the waiting time' do
-      expect(Grell::Reader).to receive(:sleep).once
+      before_time = Time.now
       Grell::Reader.wait_for(->{''}, waiting_time, sleeping_time) do
         condition
       end
+      expect(Time.now - before_time).to be > waiting_time
     end
 
   end
