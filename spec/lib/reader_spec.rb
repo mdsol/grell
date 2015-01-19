@@ -9,7 +9,7 @@ RSpec.describe Grell::Reader do
       Grell::Reader.wait_for(->{''}, waiting_time, sleeping_time) do
         condition
       end
-      expect(Time.now - before_time < 1)
+      expect(Time.now - before_time).to be < 1
     end
   end
 
