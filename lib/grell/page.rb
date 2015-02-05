@@ -10,6 +10,7 @@ module Grell
     attr_accessor :visited
 
     def initialize( url, id, parent_id)
+      gg
       @rawpage = RawPage.new
       @url = url
       @links = []
