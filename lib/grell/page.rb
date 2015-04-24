@@ -87,7 +87,7 @@ module Grell
     end
 
     def all_links
-      unique_links = @rawpage.all_anchors.map { |a| a[:href] }.uniq.compact
+      unique_links = @rawpage.all_anchors.map { |anchor| anchor[:href] }.uniq.compact
       unique_links.map { |link| link_to_url(link) }.compact
     rescue Capybara::Poltergeist::ObsoleteNode
       Log.warn "We found an obsolete node in #{@url}. Ignoring all links"
