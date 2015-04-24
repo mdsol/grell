@@ -1,5 +1,3 @@
-require 'byebug'
-
 RSpec.describe Grell::Page do
 
   let(:page_id) { rand(10).floor + 10}
