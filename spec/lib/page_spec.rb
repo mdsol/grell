@@ -29,7 +29,7 @@ RSpec.describe Grell::Page do
       expect(page.status).to eq(status)
     end
 
-    it 'has an empty body' do
+    it 'has the correct body' do
       expect(page.body).to eq(body)
     end
 
@@ -93,7 +93,7 @@ RSpec.describe Grell::Page do
     it_behaves_like 'a grell page'
   end
 
-  context 'navigating to the URL we get page with links' do
+  context 'navigating to the URL we get page with links using a elements' do
     let(:visited) {true}
     let(:status) { 200}
     let(:body) do
@@ -117,7 +117,66 @@ RSpec.describe Grell::Page do
     it 'do not return links to external websites' do
       expect(page.links).to_not include('http://www.outsidewebsite.com/help.html')
     end
-
   end
+
+  context 'navigating to the URL we get page with links with absolute links' do
+    let(:visited) {true}
+    let(:status) { 200}
+    let(:body) do
+      "<html><head></head><body>
+      Hello world!
+      <a href=\"/trusmis.html\">trusmis</a>
+      <a href=\"http://www.example.com/help.html\">help</a>
+      <a href=\"http://www.outsidewebsite.com/help.html\">help</a>
+      </body></html>"
+    end
+    let(:links) {["http://www.example.com/trusmis.html", "http://www.example.com/help.html"]}
+    let(:expected_headers) {returned_headers}
+
+    before do
+      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers.dup)
+      page.navigate
+    end
+
+    it_behaves_like 'a grell page'
+
+    it 'do not return links to external websites' do
+      expect(page.links).to_not include('http://www.outsidewebsite.com/help.html')
+    end
+  end
+
+  context 'navigating to the URL we get page with links using a mix of elements' do
+    let(:visited) {true}
+    let(:status) { 200}
+    let(:body) do
+      "<html><head></head><body>
+      Hello world!
+      <a href=\"/trusmis.html\">trusmis</a>
+      <table>
+      <tbody>
+      <tr href=\"/help.html\"><td>help</td></tr>
+      <tr data-href=\"/help.html\"><td>help</td></tr>
+      </tbody>
+      </table>
+      <div data-href=\"http://www.example.com/help.html\">help</div>
+      <div data-href=\"http://www.outsidewebsite.com/help.html\">help</div>
+      </body></html>"
+    end
+    let(:links) {["http://www.example.com/trusmis.html", "http://www.example.com/help.html"]}
+    let(:expected_headers) {returned_headers}
+
+    before do
+      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers.dup)
+      page.navigate
+    end
+
+    it_behaves_like 'a grell page'
+
+    it 'do not return links to external websites' do
+      expect(page.links).to_not include('http://www.outsidewebsite.com/help.html')
+    end
+  end
+
+
 
 end

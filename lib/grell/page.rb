@@ -87,8 +87,10 @@ module Grell
     end
 
     def all_links
-      unique_links = @rawpage.all_anchors.map { |anchor| anchor[:href] }.uniq.compact
-      unique_links.map { |link| link_to_url(link) }.compact
+      unique_links = @rawpage.all_anchors.map do |anchor|
+       anchor['href'] || anchor['data-href']
+     end.compact
+      unique_links.map { |link| link_to_url(link) }.uniq.compact
     rescue Capybara::Poltergeist::ObsoleteNode
       Log.warn "We found an obsolete node in #{@url}. Ignoring all links"
       # Sometimes Javascript and timing may screw this, we lose these links.
@@ -100,16 +102,24 @@ module Grell
     # nil from this
     def link_to_url(link)
       uri = URI.parse(link)
-      return nil if uri.host && uri.host != host #We do not want other host being defined
-      if uri.path.nil?
-        Log.info "GRELL does not follow links without a path: #{uri}"
-        return nil
-      end
-      if uri.path.start_with?('/')
-        host + link  #convert to full URL
-      else #links like href="google.com" the browser would go to http://google.com like "http://#{link}"
-        Log.info "GRELL Bad formatted link: #{link}, assuming external"
-        nil
+      if uri.absolute?
+        if uri.host != URI.parse(host).host
+          Log.info "GRELL does not follow links to external hosts: #{link}"
+          nil
+        else
+          link # Absolute link to our own host
+        end
+      else
+        if uri.path.nil?
+          Log.info "GRELL does not follow links without a path: #{uri}"
+          nil
+        end
+        if uri.path.start_with?('/')
+          host + link  #convert to full URL
+        else #links like href="google.com" the browser would go to http://google.com like "http://#{link}"
+          Log.info "GRELL Bad formatted link: #{link}, assuming external"
+          nil
+        end
       end
 
     rescue URI::InvalidURIError #We will have invalid links propagating till we navigate to them
