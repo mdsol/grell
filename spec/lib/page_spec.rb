@@ -38,7 +38,7 @@ RSpec.describe Grell::Page do
     end
 
     it 'has the correct links' do
-      expect(page.links).to eq(links)
+      expect(page.links.sort).to eq(links.sort)
     end
 
     it '#visited? returns the correct value' do
@@ -154,15 +154,19 @@ RSpec.describe Grell::Page do
       <a href=\"/trusmis.html\">trusmis</a>
       <table>
       <tbody>
-      <tr href=\"/help.html\"><td>help</td></tr>
+      <tr href=\"/help_me.html\"><td>help</td></tr>
       <tr data-href=\"/help.html\"><td>help</td></tr>
       </tbody>
       </table>
-      <div data-href=\"http://www.example.com/help.html\">help</div>
+      <div data-href=\"http://www.example.com/more_help.html\">help</div>
       <div data-href=\"http://www.outsidewebsite.com/help.html\">help</div>
       </body></html>"
     end
-    let(:links) {["http://www.example.com/trusmis.html", "http://www.example.com/help.html"]}
+    let(:links) do
+      ["http://www.example.com/trusmis.html", "http://www.example.com/help.html", 
+       'http://www.example.com/more_help.html', 'http://www.example.com/help_me.html'
+      ]
+    end
     let(:expected_headers) {returned_headers}
 
     before do
