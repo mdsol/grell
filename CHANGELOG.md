@@ -1,3 +1,6 @@
+* Version 1.1.1
+  Solve bug with the new data-href functionality
+
 * Version 1.1
   Solve problem with randomly failing spec
   Search for elements with 'href' or 'data-href' to find links
