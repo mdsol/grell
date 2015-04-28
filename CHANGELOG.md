@@ -1,3 +1,6 @@
+* Version 1.2.1
+  Solve bug: URLs are case insensitive
+
 * Version 1.2
   Grell now will consider two links to point to the same page only when the whole URL is exactly the same.
   Versions previously would only consider two links to be the same when they shared the path.
