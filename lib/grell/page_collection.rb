@@ -32,8 +32,10 @@ module Grell
     end
 
     def add(page)
+      # Although finding unique pages based on URL will add pages with different query parameters,
+      # in some cases we do link to different pages depending on the query parameters like when using proxies
       new_url = @collection.none? do |collection_page|
-        collection_page.path == page.path
+        collection_page.url == page.url
       end
       if new_url
         @collection.push page

@@ -1,6 +1,8 @@
 
 RSpec.describe Grell::PageCollection do
   let(:collection) {Grell::PageCollection.new}
+  let(:url) {'http://www.github.com/SomeUser/dragonlance?search=false'}
+  let(:url2) {'http://www.github.com/OtherUser/forgotten?search=false'}
 
   context 'empty collection' do
 
@@ -18,7 +20,7 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'one unvisited page' do
-    let(:page) {collection.create_page('url', 0)}
+    let(:page) {collection.create_page(url, 0)}
     before do
       page.visited = false
     end
@@ -38,7 +40,7 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'one visited page' do
-    let(:page) {collection.create_page('url', 0)}
+    let(:page) {collection.create_page(url, 0)}
     before do
       page.visited = true
     end
@@ -57,8 +59,8 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'one visited and one unvisited page with the same url' do
-    let(:page) {collection.create_page('url', 0)}
-    let(:unvisited)  {collection.create_page('url', 0)}
+    let(:page) {collection.create_page(url, 0)}
+    let(:unvisited)  {collection.create_page(url, 0)}
     before do
       page.visited = true
       unvisited.visited = false
@@ -86,8 +88,30 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'one visited and one unvisited page with different URLs' do
-    let(:page) {collection.create_page('url', 0)}
-    let(:unvisited)  {collection.create_page('url2', 0)}
+    let(:page) {collection.create_page(url, 0)}
+    let(:unvisited)  {collection.create_page(url2, 0)}
+    before do
+      page.visited = true
+      unvisited.visited = false
+    end
+
+    it 'has one visited page' do
+      expect(collection.visited_pages).to eq([page])
+    end
+
+    it 'has one discovered page' do
+      expect(collection.discovered_pages).to eq([unvisited])
+    end
+
+    it 'next page is the unvisited page' do
+      expect(collection.next_page).to eq(unvisited)
+    end
+  end
+
+  context 'one visited and one unvisited page with different URLs only different by the query' do
+    let(:page) {collection.create_page(url, 0)}
+    let(:url3) {'http://www.github.com/SomeUser/dragonlance?search=true'}
+    let(:unvisited)  {collection.create_page(url3, 0)}
     before do
       page.visited = true
       unvisited.visited = false
@@ -107,8 +131,8 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'several unvisited pages' do
-    let(:page) {collection.create_page('url', 2)}
-    let(:page2) {collection.create_page('url2', 0)}
+    let(:page) {collection.create_page(url, 2)}
+    let(:page2) {collection.create_page(url2, 0)}
     before do
       page.visited = false
       page2.visited = false

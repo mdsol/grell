@@ -1,3 +1,7 @@
+* Version 1.2
+  Grell now will consider two links to point to the same page only when the whole URL is exactly the same.
+  Versions previously would only consider two links to be the same when they shared the path.
+
 * Version 1.1.2
   Solve bug where we were adding links in heads as if there were normal links in the body
 
