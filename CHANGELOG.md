@@ -1,3 +1,6 @@
+* Version 1.1.2
+  Solve bug where we were adding links in heads as if there were normal links in the body
+
 * Version 1.1.1
   Solve bug with the new data-href functionality
 

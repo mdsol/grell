@@ -181,6 +181,41 @@ RSpec.describe Grell::Page do
     end
   end
 
+ context 'navigating to the URL we get page with links inside the header section of the code' do
+    let(:visited) {true}
+    let(:status) { 200}
+    let(:css) {'/application.css'}
+    let(:favicon) {'/favicon.ico'}
+    let(:body) do
+      "<html><head>
+      <title>mimi</title>
+      <link href=\"#{css}\" rel=\"stylesheet\">
+      <link href=\"#{favicon}\" rel=\"shortcut icon\" type=\"image/vnd.microsoft.icon\">
+      </head>
+      <body>
+      Hello world!
+      <a href=\"/trusmis.html\">trusmis</a>
+      </body></html>"
+    end
+    let(:links) do
+      ["http://www.example.com/trusmis.html"]
+    end
+    let(:expected_headers) {returned_headers}
 
+    before do
+      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers.dup)
+      #We need to stub this or Phantomjs will get stuck trying to retrieve the resources
+      proxy.stub(host + css).and_return(body: '', code: status)
+      proxy.stub(host + favicon).and_return(body: '', code: status)
+      page.navigate
+    end
+
+    it_behaves_like 'a grell page'
+
+    it 'do not return links to resources in the header' do
+      expect(page.links).to_not include('http://www.example.com/application.css')
+    end
+
+  end
 
 end

@@ -87,10 +87,15 @@ module Grell
     end
 
     def all_links
-      unique_links = @rawpage.all_anchors.map do |anchor|
+      # <link> can only be used in the <head> as of: https://developer.mozilla.org/en/docs/Web/HTML/Element/link
+      anchors_in_body = @rawpage.all_anchors.reject{|anchor| anchor.tag_name == 'link' }
+
+      unique_links = anchors_in_body.map do |anchor|
        anchor['href'] || anchor['data-href']
-     end.compact
+      end.compact
+
       unique_links.map { |link| link_to_url(link) }.uniq.compact
+
     rescue Capybara::Poltergeist::ObsoleteNode
       Log.warn "We found an obsolete node in #{@url}. Ignoring all links"
       # Sometimes Javascript and timing may screw this, we lose these links.
