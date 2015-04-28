@@ -23,6 +23,10 @@ RSpec.describe Grell::Page do
     expect(page.parent_id).to eq(parent_page_id)
   end
 
+  it 'newly created page does not have status yet' do
+    expect(page.status).to eq(nil)
+  end
+
   shared_examples_for 'a grell page' do
 
     it 'returns the correct status' do
@@ -45,6 +49,25 @@ RSpec.describe Grell::Page do
       expect(page.visited?).to eq(visited)
     end
 
+  end
+
+  context 'incorrect url' do
+    let(:url) { 'awww.wewrrw.www' }
+    let(:page) {Grell::Page.new(url, page_id, parent_page_id)}
+    it 'returns the whole url as path' do
+      expect(page.path).to eq(url)
+    end
+
+    it 'returns empty status 404 page after navigating' do
+      proxy.stub(url).and_return(body: '')
+      page.navigate
+      expect(page.status).to eq(404)
+      expect(page.links).to eq([])
+      expect(page.headers).to eq({})
+      expect(page.body).to eq('')
+      expect(page).to be_visited
+      expect(Grell::Log).to receive(:warn).with(/The page with the URL #{url} was not available"/)
+    end
   end
 
   context 'we have not yet navigated to the page' do

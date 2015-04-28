@@ -36,6 +36,8 @@ module Grell
       unavailable_page(404)
     rescue Capybara::Poltergeist::TimeoutError #Poltergeist has its own timeout which is similar to Chromes.
       unavailable_page(404)
+    rescue Capybara::Poltergeist::StatusFailError
+      unavailable_page(404)
     end
 
     def headers
@@ -52,7 +54,7 @@ module Grell
 
     def status
       return nil unless @visited
-      @rawpage.status
+      @rawpage.status || @failed_status
     end
 
     def has_selector?(selector)
@@ -81,7 +83,7 @@ module Grell
       @visited = true
       @timestamp = Time.now
       @links =  []
-      @status = status
+      @failed_status = status
       @headers = {}
       @body = ''
     end
