@@ -60,7 +60,7 @@ RSpec.describe Grell::PageCollection do
 
   context 'one visited and one unvisited page with the same url' do
     let(:page) {collection.create_page(url, 0)}
-    let(:unvisited)  {collection.create_page(url, 0)}
+    let(:unvisited)  {collection.create_page(url.upcase, 0)}
     before do
       page.visited = true
       unvisited.visited = false
