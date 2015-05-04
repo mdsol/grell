@@ -1,3 +1,12 @@
+* Version 1.3
+  The Crawler object allows you to provide an external logger object.
+  Clearer semantics when an error happens, special headers are returned so the user can inspect the error
+
+  Caveats:
+  - The 'debug' option in the crawler does not have any affect anymore. Provide an external logger with 'logger' instead
+  - The errors provided in the headers by grell has changed from 'grell_status' to 'grellStatus'.
+  - The 'visited' property in the page was never supposed to be accesible. Use 'visited?' instead.
+
 * Version 1.2.1
   Solve bug: URLs are case insensitive
 

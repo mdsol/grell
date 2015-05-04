@@ -12,6 +12,17 @@ RSpec.describe Grell::Crawler do
     proxy.stub(url).and_return(body: body, code: 200)
   end
 
+  describe 'initialize' do
+    it 'can provide your own logger' do
+      Grell::Crawler.new(external_driver: true, logger: 33)
+      expect(Grell.logger).to eq(33)
+    end
+    it 'provides a stdout logger if nothing provided' do
+      crawler
+      expect(Grell.logger).to be_instance_of(Logger)
+    end
+  end
+
   context '#crawl' do
     it 'yields the result if a block is given' do
       result = []
@@ -19,11 +30,12 @@ RSpec.describe Grell::Crawler do
       crawler.crawl(page, block)
       expect(result.size).to eq(1)
       expect(result.first.url).to eq(url)
-      expect(result.first.visited).to eq(true)
+      expect(result.first.visited?).to eq(true)
     end
 
     it 'logs interesting information' do
-      expect(Grell::Log).to receive(:info).with(/Visiting #{url}, visited_links: 0, discovered 0/)
+      crawler
+      expect(Grell.logger).to receive(:info).with(/Visiting #{url}, visited_links: 0, discovered 0/)
       crawler.crawl(page, nil)
     end
   end
