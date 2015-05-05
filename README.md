@@ -61,5 +61,6 @@ bundle exec rake ci
 ```
 
 ## Contributors
+Grell is (c) Medidata Solutions Worldwide and owned by its major contributors:
 * [Teruhide Hoshikawa](https://github.com/thoshikawa-mdsol)
-* [Jordi Carres](https://github.com/jcarres-mdsol)
+* [Jordi Polo Carres](https://github.com/jcarres-mdsol)
