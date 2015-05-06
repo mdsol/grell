@@ -207,20 +207,20 @@ module Grell
         uri = URI.parse(link)
         if uri.absolute?
           if uri.host != URI.parse(host).host
-            Grell.logger.info "GRELL does not follow links to external hosts: #{link}"
+            Grell.logger.debug "GRELL does not follow links to external hosts: #{link}"
             nil
           else
             link # Absolute link to our own host
           end
         else
           if uri.path.nil?
-            Grell.logger.info "GRELL does not follow links without a path: #{uri}"
+            Grell.logger.debug "GRELL does not follow links without a path: #{uri}"
             nil
           end
           if uri.path.start_with?('/')
             host + link  #convert to full URL
           else #links like href="google.com" the browser would go to http://google.com like "http://#{link}"
-            Grell.logger.info "GRELL Bad formatted link: #{link}, assuming external"
+            Grell.logger.debug "GRELL Bad formatted link: #{link}, assuming external"
             nil
           end
         end
