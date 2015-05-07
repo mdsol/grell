@@ -22,7 +22,7 @@ RSpec.describe Grell::PageCollection do
   context 'one unvisited page' do
     let(:page) {collection.create_page(url, 0)}
     before do
-      page.visited = false
+      allow(page).to receive(:visited?).and_return(false)
     end
 
     it 'has no visited pages' do
@@ -42,7 +42,7 @@ RSpec.describe Grell::PageCollection do
   context 'one visited page' do
     let(:page) {collection.create_page(url, 0)}
     before do
-      page.visited = true
+      allow(page).to receive(:visited?).and_return(true)
     end
 
     it 'has one visited page' do
@@ -62,8 +62,8 @@ RSpec.describe Grell::PageCollection do
     let(:page) {collection.create_page(url, 0)}
     let(:unvisited)  {collection.create_page(url.upcase, 0)}
     before do
-      page.visited = true
-      unvisited.visited = false
+      allow(page).to receive(:visited?).and_return(true)
+      allow(unvisited).to receive(:visited?).and_return(false)
     end
 
     it 'first page has id 0' do
@@ -91,8 +91,8 @@ RSpec.describe Grell::PageCollection do
     let(:page) {collection.create_page(url, 0)}
     let(:unvisited)  {collection.create_page(url2, 0)}
     before do
-      page.visited = true
-      unvisited.visited = false
+      allow(page).to receive(:visited?).and_return(true)
+      allow(unvisited).to receive(:visited?).and_return(false)
     end
 
     it 'has one visited page' do
@@ -113,8 +113,8 @@ RSpec.describe Grell::PageCollection do
     let(:url3) {'http://www.github.com/SomeUser/dragonlance?search=true'}
     let(:unvisited)  {collection.create_page(url3, 0)}
     before do
-      page.visited = true
-      unvisited.visited = false
+      allow(page).to receive(:visited?).and_return(true)
+      allow(unvisited).to receive(:visited?).and_return(false)
     end
 
     it 'has one visited page' do
@@ -134,8 +134,8 @@ RSpec.describe Grell::PageCollection do
     let(:page) {collection.create_page(url, 2)}
     let(:page2) {collection.create_page(url2, 0)}
     before do
-      page.visited = false
-      page2.visited = false
+      allow(page).to receive(:visited?).and_return(true)
+      allow(page2).to receive(:visited?).and_return(false)
     end
 
     it "returns the page which has an earlier parent" do

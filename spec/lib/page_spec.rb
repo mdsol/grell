@@ -6,13 +6,13 @@ RSpec.describe Grell::Page do
   let(:host) {"http://www.example.com"}
   let(:url) {"http://www.example.com/test"}
   let(:returned_headers)  { { 'Other-Header' => 'yes', 'Content-Type' => 'text/html' }}
+  let(:now) {Time.now}
+  before do
+    allow(Time).to receive(:now).and_return(now)
+  end
 
   it "gives access to the url" do
     expect(page.url).to eq(url)
-  end
-
-  it 'gives access to the path' do
-    expect(page.path).to eq('/test')
   end
 
   it "gives access to the page id" do
@@ -21,6 +21,10 @@ RSpec.describe Grell::Page do
 
   it "gives access to the parent page id" do
     expect(page.parent_id).to eq(parent_page_id)
+  end
+
+  it 'newly created page does not have status yet' do
+    expect(page.status).to eq(nil)
   end
 
   shared_examples_for 'a grell page' do
@@ -45,7 +49,47 @@ RSpec.describe Grell::Page do
       expect(page.visited?).to eq(visited)
     end
 
+    it 'has correct timestamp' do
+      expect(page.timestamp).to eq(now)
+    end
+
   end
+
+  shared_examples_for 'an errored grell page' do
+    it 'returns empty status 404 page after navigating' do 
+      expect(page.status).to eq(404)
+      expect(page.links).to eq([])
+      expect(page.headers).to eq(headers)
+      expect(page.body).to eq('')
+      expect(page.has_selector?('html')).to eq(false)
+      expect(page).to be_visited
+      expect(page.timestamp).to eq(now)
+      #expect_any_instance_of(Logger).to receive(:warn) #.with(/The page with the URL #{url} was not available"/)
+    end
+  end
+
+  [Capybara::Poltergeist::JavascriptError, Capybara::Poltergeist::BrowserError, URI::InvalidURIError,
+   Capybara::Poltergeist::TimeoutError, Capybara::Poltergeist::StatusFailError ].each do |error_type|
+
+    context "#{error_type}" do
+      let(:headers) do
+        {
+          grellStatus: 'Error',
+          errorClass: "#{error_type}",
+          errorMessage: error_message
+        }
+      end
+      let(:error_message) {'Trusmis broke it again'}
+      let(:now) {Time.now}
+      before do
+        allow_any_instance_of(Grell::RawPage).to receive(:navigate).and_raise(error_type, 'error')
+        allow_any_instance_of(error_type).to receive(:message).and_return(error_message)
+        page.navigate
+      end
+      it_behaves_like 'an errored grell page'
+    end
+  end
+
 
   context 'we have not yet navigated to the page' do
     let(:visited) {false}
@@ -53,6 +97,7 @@ RSpec.describe Grell::Page do
     let(:body) {''}
     let(:links) {[]}
     let(:expected_headers) {{}}
+    let(:now) {nil}
 
     before do
       proxy.stub(url).and_return(body: body, code: status, headers: returned_headers.dup)
@@ -216,6 +261,24 @@ RSpec.describe Grell::Page do
       expect(page.links).to_not include('http://www.example.com/application.css')
     end
 
+  end
+
+  context 'status is never set' do #this may happen when there is nothing comming from the site
+    before do
+      stub_const('Grell::Page::WAIT_TIME', 0)
+      allow_any_instance_of(Grell::RawPage).to receive(:status).and_return(nil)
+      allow_any_instance_of(Grell::RawPage).to receive(:headers).and_return({})
+      allow_any_instance_of(Grell::RawPage).to receive(:body).and_return('')
+      proxy.stub(url).and_return(body: body, code: nil, headers: {})
+      page.navigate
+    end
+    let(:visited) {true}
+    let(:status) { nil}
+    let(:body) {''}
+    let(:links) {[]}
+    let(:expected_headers) {{}}
+
+    it_behaves_like 'a grell page'
   end
 
 end
