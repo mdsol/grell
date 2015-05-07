@@ -15,10 +15,6 @@ RSpec.describe Grell::Page do
     expect(page.url).to eq(url)
   end
 
-  it 'gives access to the path' do
-    expect(page.path).to eq('/test')
-  end
-
   it "gives access to the page id" do
     expect(page.id).to eq(page_id)
   end
@@ -283,23 +279,6 @@ RSpec.describe Grell::Page do
     let(:expected_headers) {{}}
 
     it_behaves_like 'a grell page'
-  end
-
-  describe '#path' do
-    context 'proper url' do
-      let(:url) {'http://www.anyurl.com/path'}
-      let(:page) {Grell::Page.new(url, page_id, parent_page_id)}
-      it 'returns the path' do
-        expect(page.path).to eq('/path')
-      end
-    end
-    context 'broken url' do
-      let(:url) {'www.an.asda.fasfasf.yurl.com/path'}
-      let(:page) {Grell::Page.new(url, page_id, parent_page_id)}
-      it 'returns the path' do
-        expect(page.path).to eq(url)
-      end
-    end
   end
 
 end

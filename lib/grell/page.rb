@@ -43,12 +43,6 @@ module Grell
       unavailable_page(404, e)
     end
 
-    def path
-      URI.parse(@url).path
-    rescue URI::InvalidURIError #Invalid URLs will be added and cought when we try to navigate to them
-      @url
-    end
-
     private
     def unavailable_page(status, exception)
       Grell.logger.warn "The page with the URL #{@url} was not available. Exception #{exception}"
@@ -192,7 +186,7 @@ module Grell
          anchor['href'] || anchor['data-href']
         end.compact
 
-        unique_links.map { |link| link_to_url(link) }.uniq.compact
+        unique_links.map{|link| link_to_url(link)}.uniq.compact
 
       rescue Capybara::Poltergeist::ObsoleteNode
         Grell.logger.warn "We found an obsolete node in #{@url}. Ignoring all links"
