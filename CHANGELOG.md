@@ -1,3 +1,6 @@
+* Version 1.4
+  Added whitelisting and blacklisting
+
 * Version 1.3
   The Crawler object allows you to provide an external logger object.
   Clearer semantics when an error happens, special headers are returned so the user can inspect the error

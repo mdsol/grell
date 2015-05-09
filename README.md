@@ -51,6 +51,56 @@ end
 Grell keeps a list of pages previously crawled and do not visit the same page twice.
 This list is indexed by the complete url, including query parameters.
 
+### Selecting links to follow
+
+Grell by default will follow all the links it finds going to the site
+your are crawling. It will never follow links linking outside your site.
+If you want to further limit the amount of links crawled, you can use
+whitelisting, blacklisting or manual filtering.
+
+#### Whitelisting
+
+```ruby
+require 'grell'
+
+crawler = Grell::Crawler.new
+crawler.whitelist([/games\/.*/, '/fun'])
+crawler.start_crawling('http://www.google.com') do |page|
+end
+```
+
+Grell here will only follow links to games and '/fun' and ignore all
+other links. You can provide a regexp, strings (if any part of the
+string match is whitelisted) or an array with regexps and/or strings.
+
+#### Blacklisting
+
+```ruby
+require 'grell'
+
+crawler = Grell::Crawler.new
+crawler.blacklist(/games\/.*/)
+crawler.start_crawling('http://www.google.com') do |page|
+end
+```
+
+Similar to whitelisting. But now Grell will follow every other link in
+this site which does not go to /games/...
+
+If you call both whitelist and blacklist then both will apply, a link
+has to fullfill both conditions to survive. If you do not call any, then
+all links on this site will be crawled. Think of these methods as
+filters.
+
+#### Manual link filtering
+
+If you have a more complex usecase, you can modify the list of links
+manually.
+Grell yields the page to you before it adds the links to the list of
+links to visit. So you can modify in your block of code "page.links" to
+add and delete links to instruct Grell to add them to the list of links
+to visit next.
+
 ### Pages' id
 
 Each page has an unique id, accessed by the property 'id'. Also each page stores the id of the page from which we found this page, accessed by the property 'parent_id'.
