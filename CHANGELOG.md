@@ -1,5 +1,6 @@
-* Version 1.4
+* Version 1.3.1
   Added whitelisting and blacklisting
+  Better info in gemspec
 
 * Version 1.3
   The Crawler object allows you to provide an external logger object.
