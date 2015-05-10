@@ -40,7 +40,7 @@ module Grell
       Grell.logger.info "Visiting #{site.url}, visited_links: #{@collection.visited_pages.size}, discovered #{@collection.discovered_pages.size}"
       site.navigate
 
-      filter(site.links)
+      filter!(site.links)
 
       block.call(site) if block
 
@@ -50,7 +50,7 @@ module Grell
     end
 
     private
-    def filter(links)
+    def filter!(links)
       links.select!{ |link| link =~ @whitelist_regexp } if @whitelist_regexp
       links.delete_if{ |link| link =~ @blacklist_regexp } if @blacklist_regexp
     end

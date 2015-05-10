@@ -5,7 +5,7 @@ RSpec.describe Grell::Crawler do
   let(:page) {Grell::Page.new(url, page_id, parent_page_id)}
   let(:host) {"http://www.example.com"}
   let(:url) {"http://www.example.com/test"}
-  let(:crawler) { Grell::Crawler.new(external_driver: true)}
+  let(:crawler) { Grell::Crawler.new(logger: Logger.new(nil), external_driver: true)}
   let(:body) {'body'}
 
   before do

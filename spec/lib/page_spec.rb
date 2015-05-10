@@ -9,6 +9,7 @@ RSpec.describe Grell::Page do
   let(:now) {Time.now}
   before do
     allow(Time).to receive(:now).and_return(now)
+    Grell.logger = Logger.new(nil) #avoids noise in rspec output
   end
 
   it "gives access to the url" do

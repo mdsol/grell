@@ -1,4 +1,8 @@
 module Grell
+  # Keeps a record of all the pages crawled.
+  # When a new url is found it is added to this collection, which makes sure it is unique.
+  # This page is part of the discovered pages. Eventually that page will be navigated to, then
+  # the page will be part of the visited pages.
   class PageCollection
     attr_reader :collection
 
