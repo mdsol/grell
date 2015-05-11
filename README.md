@@ -65,8 +65,7 @@ require 'grell'
 
 crawler = Grell::Crawler.new
 crawler.whitelist([/games\/.*/, '/fun'])
-crawler.start_crawling('http://www.google.com') do |page|
-end
+crawler.start_crawling('http://www.google.com')
 ```
 
 Grell here will only follow links to games and '/fun' and ignore all
@@ -80,8 +79,7 @@ require 'grell'
 
 crawler = Grell::Crawler.new
 crawler.blacklist(/games\/.*/)
-crawler.start_crawling('http://www.google.com') do |page|
-end
+crawler.start_crawling('http://www.google.com')
 ```
 
 Similar to whitelisting. But now Grell will follow every other link in
@@ -94,7 +92,7 @@ filters.
 
 #### Manual link filtering
 
-If you have a more complex usecase, you can modify the list of links
+If you have a more complex use-case, you can modify the list of links
 manually.
 Grell yields the page to you before it adds the links to the list of
 links to visit. So you can modify in your block of code "page.links" to
@@ -115,8 +113,7 @@ When there is an error in the page or an internal error in the crawler (Javascri
 - errorMessage: A descriptive message with the information Grell could gather about the error.
 
 ### Logging
-You can pass your logger to Grell and Grell will log using it.
-For example in a Rails app:
+You can pass your logger to Grell. For example in a Rails app:
 ```Ruby
 crawler = Grell::Crawler.new(logger: Rails.logger)
 ```
