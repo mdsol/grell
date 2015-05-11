@@ -5,7 +5,7 @@ RSpec.describe Grell::Crawler do
   let(:page) {Grell::Page.new(url, page_id, parent_page_id)}
   let(:host) {"http://www.example.com"}
   let(:url) {"http://www.example.com/test"}
-  let(:crawler) { Grell::Crawler.new(external_driver: true)}
+  let(:crawler) { Grell::Crawler.new(logger: Logger.new(nil), external_driver: true)}
   let(:body) {'body'}
 
   before do
@@ -64,21 +64,33 @@ RSpec.describe Grell::Crawler do
     end
   end
 
+  shared_examples_for 'visits all available pages' do
+    it 'visits all the pages' do
+      crawler.start_crawling(url)
+      expect(crawler.collection.visited_pages.size).to eq(visited_pages_count)
+    end
+    it 'has no more pages to discover' do
+      crawler.start_crawling(url)
+      expect(crawler.collection.discovered_pages.size).to eq(0)
+    end
+
+    it 'contains the whitelisted page and the base page only' do
+      crawler.start_crawling(url)
+      expect(crawler.collection.visited_pages.map(&:url)).
+        to eq(visited_pages)
+    end
+  end
+
   context 'the url has no links' do
     let(:body) do
       "<html><head></head><body>
       Hello world!
       </body></html>"
     end
-    before do
-      crawler.start_crawling(url)
-    end
-    it 'visits all the pages' do
-      expect(crawler.collection.visited_pages.size).to eq(1)
-    end
-    it 'has no more pages to discover' do
-      expect(crawler.collection.discovered_pages.size).to eq(0)
-    end
+    let(:visited_pages_count) {1}
+    let(:visited_pages) {['http://www.example.com/test']}
+
+    it_behaves_like 'visits all available pages'
   end
 
   context 'the url has several links' do
@@ -93,14 +105,228 @@ RSpec.describe Grell::Crawler do
       proxy.stub('http://www.example.com/trusmis.html').and_return(body: 'body', code: 200)
       proxy.stub('http://www.example.com/help.html').and_return(body: 'body', code: 200)
     end
-
-    it 'visits all the pages' do
-      crawler.start_crawling(url)
-      expect(crawler.collection.visited_pages.size).to eq(3)
+    let(:visited_pages_count) {3}
+    let(:visited_pages) do
+      ['http://www.example.com/test','http://www.example.com/trusmis.html', 'http://www.example.com/help.html']
     end
-    it 'has no more pages to discover' do
-      crawler.start_crawling(url)
-      expect(crawler.collection.discovered_pages.size).to eq(0)
+
+    it_behaves_like 'visits all available pages'
+  end
+
+  describe '#whitelist' do
+    let(:body) do
+      "<html><head></head><body>
+      <a href=\"/trusmis.html\">trusmis</a>
+      <a href=\"/help.html\">help</a>
+      Hello world!
+      </body></html>"
+    end
+
+    before do
+      proxy.stub('http://www.example.com/trusmis.html').and_return(body: 'body', code: 200)
+      proxy.stub('http://www.example.com/help.html').and_return(body: 'body', code: 200)
+    end
+
+    context 'using a single string' do
+      before do
+        crawler.whitelist('/trusmis.html')
+      end
+      let(:visited_pages_count) {2} #my own page + trusmis
+      let(:visited_pages) do
+        ['http://www.example.com/test','http://www.example.com/trusmis.html']
+      end
+
+      it_behaves_like 'visits all available pages'
+    end
+
+    context 'using an array of strings' do
+      before do
+        crawler.whitelist(['/trusmis.html', '/nothere', 'another.html'])
+      end
+      let(:visited_pages_count) {2}
+      let(:visited_pages) do
+        ['http://www.example.com/test','http://www.example.com/trusmis.html']
+      end
+
+      it_behaves_like 'visits all available pages'
+    end
+
+    context 'using a regexp' do
+      before do
+        crawler.whitelist(/\/trusmis\.html/)
+      end
+      let(:visited_pages_count) {2}
+      let(:visited_pages) do
+        ['http://www.example.com/test','http://www.example.com/trusmis.html']
+      end
+
+      it_behaves_like 'visits all available pages'
+    end
+
+    context 'using an array of regexps' do
+      before do
+        crawler.whitelist([/\/trusmis\.html/])
+      end
+      let(:visited_pages_count) {2}
+      let(:visited_pages) do
+        ['http://www.example.com/test','http://www.example.com/trusmis.html']
+      end
+
+      it_behaves_like 'visits all available pages'
+    end
+
+    context 'using an empty array' do
+      before do
+        crawler.whitelist([])
+      end
+      let(:visited_pages_count) {1} #my own page only
+      let(:visited_pages) do
+        ['http://www.example.com/test']
+      end
+
+      it_behaves_like 'visits all available pages'
+    end
+
+    context 'adding all links to the whitelist' do
+      before do
+        crawler.whitelist(['/trusmis', '/help'])
+      end
+      let(:visited_pages_count) {3} #all links
+      let(:visited_pages) do
+        ['http://www.example.com/test','http://www.example.com/trusmis.html', 'http://www.example.com/help.html']
+      end
+
+      it_behaves_like 'visits all available pages'
+    end
+  end
+
+
+  describe '#blacklist' do
+    let(:body) do
+      "<html><head></head><body>
+      <a href=\"/trusmis.html\">trusmis</a>
+      <a href=\"/help.html\">help</a>
+      Hello world!
+      </body></html>"
+    end
+
+    before do
+      proxy.stub('http://www.example.com/trusmis.html').and_return(body: 'body', code: 200)
+      proxy.stub('http://www.example.com/help.html').and_return(body: 'body', code: 200)
+    end
+
+    context 'using a single string' do
+      before do
+        crawler.blacklist('/trusmis.html')
+      end
+      let(:visited_pages_count) {2}
+      let(:visited_pages) do
+        ['http://www.example.com/test','http://www.example.com/help.html']
+      end
+
+      it_behaves_like 'visits all available pages'
+    end
+
+    context 'using an array of strings' do
+      before do
+        crawler.blacklist(['/trusmis.html', '/nothere', 'another.html'])
+      end
+      let(:visited_pages_count) {2}
+      let(:visited_pages) do
+        ['http://www.example.com/test','http://www.example.com/help.html']
+      end
+
+      it_behaves_like 'visits all available pages'
+    end
+
+    context 'using a regexp' do
+      before do
+        crawler.blacklist(/\/trusmis\.html/)
+      end
+      let(:visited_pages_count) {2}
+      let(:visited_pages) do
+        ['http://www.example.com/test','http://www.example.com/help.html']
+      end
+
+      it_behaves_like 'visits all available pages'
+    end
+
+    context 'using an array of regexps' do
+      before do
+        crawler.blacklist([/\/trusmis\.html/])
+      end
+      let(:visited_pages_count) {2}
+      let(:visited_pages) do
+        ['http://www.example.com/test','http://www.example.com/help.html']
+      end
+
+      it_behaves_like 'visits all available pages'
+    end
+
+    context 'using an empty array' do
+      before do
+        crawler.blacklist([])
+      end
+      let(:visited_pages_count) {3} #all links
+      let(:visited_pages) do
+        ['http://www.example.com/test','http://www.example.com/trusmis.html', 'http://www.example.com/help.html']
+      end
+
+      it_behaves_like 'visits all available pages'
+    end
+
+    context 'adding all links to the whitelist' do
+      before do
+        crawler.blacklist(['/trusmis', '/help'])
+      end
+      let(:visited_pages_count) {1}
+      let(:visited_pages) do
+        ['http://www.example.com/test']
+      end
+
+      it_behaves_like 'visits all available pages'
+    end
+  end
+
+
+  describe 'Whitelisting and blacklisting' do
+    let(:body) do
+      "<html><head></head><body>
+      <a href=\"/trusmis.html\">trusmis</a>
+      <a href=\"/help.html\">help</a>
+      Hello world!
+      </body></html>"
+    end
+
+    before do
+      proxy.stub('http://www.example.com/trusmis.html').and_return(body: 'body', code: 200)
+      proxy.stub('http://www.example.com/help.html').and_return(body: 'body', code: 200)
+    end
+
+    context 'we blacklist the only whitelisted page' do
+      before do
+        crawler.whitelist('/trusmis.html')
+        crawler.blacklist('/trusmis.html')
+      end
+      let(:visited_pages_count) {1}
+      let(:visited_pages) do
+        ['http://www.example.com/test']
+      end
+
+      it_behaves_like 'visits all available pages'
+    end
+
+    context 'we blacklist none of the whitelisted pages' do
+      before do
+        crawler.whitelist('/trusmis.html')
+        crawler.blacklist('/raistlin.html')
+      end
+      let(:visited_pages_count) {2}
+      let(:visited_pages) do
+        ['http://www.example.com/test', 'http://www.example.com/trusmis.html']
+      end
+
+      it_behaves_like 'visits all available pages'
     end
   end
 

@@ -1,3 +1,7 @@
+* Version 1.3.1
+  Added whitelisting and blacklisting
+  Better info in gemspec
+
 * Version 1.3
   The Crawler object allows you to provide an external logger object.
   Clearer semantics when an error happens, special headers are returned so the user can inspect the error
