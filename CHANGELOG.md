@@ -1,3 +1,6 @@
+* Version 1.3.2
+  Rescue Timeout error and return an empty page when that happens
+
 * Version 1.3.1
   Added whitelisting and blacklisting
   Better info in gemspec
