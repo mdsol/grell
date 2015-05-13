@@ -41,6 +41,8 @@ module Grell
       unavailable_page(404, e)
     rescue Capybara::Poltergeist::StatusFailError => e
       unavailable_page(404, e)
+    rescue Timeout::Error => e #This error inherits from Interruption, do not inherit from StandardError
+      unavailable_page(404, e)
     end
 
     private
