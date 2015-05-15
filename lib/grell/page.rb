@@ -11,6 +11,7 @@ module Grell
     WAIT_INTERVAL = 0.5
 
     attr_reader :url, :timestamp, :id, :parent_id, :rawpage
+
     #Most of the interesting information accessed through this class is accessed by the methods below
     def_delegators :@result_page, :headers, :body, :status, :links, :has_selector?, :host, :visited?
 
@@ -20,6 +21,7 @@ module Grell
       @id = id
       @parent_id = parent_id
       @timestamp = nil
+      @times_visited = 0
       @result_page = UnvisitedPage.new
     end
 
@@ -31,6 +33,7 @@ module Grell
       end
       @result_page = VisitedPage.new(@rawpage)
       @timestamp = Time.now
+      @times_visited += 1
     rescue Capybara::Poltergeist::JavascriptError => e
       unavailable_page(404, e)
     rescue Capybara::Poltergeist::BrowserError => e #This may happen internally on Poltergeist, they claim is a bug.
@@ -43,6 +46,10 @@ module Grell
       unavailable_page(404, e)
     rescue Timeout::Error => e #This error inherits from Interruption, do not inherit from StandardError
       unavailable_page(404, e)
+    end
+
+    def retries
+      [@times_visited -1, 0].max
     end
 
     private

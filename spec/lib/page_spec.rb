@@ -56,6 +56,35 @@ RSpec.describe Grell::Page do
 
   end
 
+  describe '#retries' do
+    context 'page has not been navigated' do
+      it '#retries return 0' do
+        expect(page.retries).to eq(0)
+      end
+    end
+
+    context 'page has been navigated once' do
+      before do
+        proxy.stub(url).and_return(body: '', code: 200, headers: {})
+        page.navigate
+      end
+      it '#retries return 0' do
+        expect(page.retries).to eq(0)
+      end
+    end
+
+    context 'page has been navigated twice' do
+      before do
+        proxy.stub(url).and_return(body: '', code: 200, headers: {})
+        page.navigate
+        page.navigate
+      end
+      it '#retries return 1' do
+        expect(page.retries).to eq(1)
+      end
+    end
+  end
+
   shared_examples_for 'an errored grell page' do
     it 'returns empty status 404 page after navigating' do 
       expect(page.status).to eq(404)
