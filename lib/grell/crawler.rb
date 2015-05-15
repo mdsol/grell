@@ -5,8 +5,10 @@ module Grell
   class Crawler
     attr_reader :collection
 
+    # Creates a crawler
+    # options allows :logger to point to an object with the same interface than Logger in the standard library
     def initialize(options = {})
-      CapybaraDriver.setup(options)
+      @driver = CapybaraDriver.setup(options)
 
       if options[:logger]
         Grell.logger = options[:logger]
@@ -17,15 +19,24 @@ module Grell
       @collection = PageCollection.new
     end
 
+    # Restarts the PhantomJS process without modifying the state of visited and discovered pages.
+    def restart
+      Grell.logger.info "GRELL is restarting"
+      @driver.restart
+      Grell.logger.info "GRELL has restarted"
+    end
+
+    # Setups a whitelist filter, allows a regexp, string or array of either to be matched.
     def whitelist(list)
       @whitelist_regexp = Regexp.union(list)
     end
 
+    # Setups a blacklist filter, allows a regexp, string or array of either to be matched.
     def blacklist(list)
       @blacklist_regexp = Regexp.union(list)
     end
 
-
+    # Main method, it starts crawling on the given URL and calls a block for each of the pages found.
     def start_crawling(url, &block)
       Grell.logger.info "GRELL Started crawling"
       @collection = PageCollection.new
@@ -39,10 +50,15 @@ module Grell
     def crawl(site, block)
       Grell.logger.info "Visiting #{site.url}, visited_links: #{@collection.visited_pages.size}, discovered #{@collection.discovered_pages.size}"
       site.navigate
-
       filter!(site.links)
 
-      block.call(site) if block
+      if block #The user of this block can send us a :retry to retry accessing the page
+        while(block.call(site) == :retry)
+          Grell.logger.info "Retrying our visit to #{site.url}"
+          site.navigate
+          filter!(site.links)
+        end
+      end
 
       site.links.each do |url|
         @collection.create_page(url, site.id)

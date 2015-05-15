@@ -1,3 +1,7 @@
+* Version 1.4.0
+  Added crawler.restart to restart browser process
+  The block of code can make grell retry any given page.
+
 * Version 1.3.2
   Rescue Timeout error and return an empty page when that happens
 

@@ -51,12 +51,35 @@ end
 Grell keeps a list of pages previously crawled and do not visit the same page twice.
 This list is indexed by the complete url, including query parameters.
 
+### Re-retrieving a page
+If you want Grell to revisit a page and return the data to you again,
+return the symbol :retry in your block in the start_crawling method.
+For instance
+```ruby
+require 'grell'
+crawler = Grell::Crawler.new
+crawler.start_crawling('http://www.google.com') do |current_page|
+  if current_page.status == 500 && current_page.retries == 0
+    crawler.restart
+    :retry
+  end
+end
+```
+
+### Restarting PhantomJS
+If you are doing a long crawling it is possible that phantomJS starts failing.
+To avoid that, you can restart it by calling "restart" on crawler.
+That will kill phantom and will restart it. Grell will keep the status of
+pages already visited and pages discovered and to be visited. And will keep crawling
+with the new phantomJS process instead of the old one.
+
 ### Selecting links to follow
 
 Grell by default will follow all the links it finds going to the site
 your are crawling. It will never follow links linking outside your site.
 If you want to further limit the amount of links crawled, you can use
 whitelisting, blacklisting or manual filtering.
+
 
 #### Whitelisting
 

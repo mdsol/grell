@@ -23,7 +23,7 @@ RSpec.describe Grell::Crawler do
     end
   end
 
-  context '#crawl' do
+  describe '#crawl' do
     it 'yields the result if a block is given' do
       result = []
       block = Proc.new {|n| result.push(n) }
@@ -37,6 +37,19 @@ RSpec.describe Grell::Crawler do
       crawler
       expect(Grell.logger).to receive(:info).with(/Visiting #{url}, visited_links: 0, discovered 0/)
       crawler.crawl(page, nil)
+    end
+
+    it 'retries when the block returns :retry' do
+      counter = 0
+      times_retrying = 2
+      block = Proc.new do |n|
+        if counter < times_retrying
+          counter += 1
+          :retry
+        end
+      end
+      crawler.crawl(page, block)
+      expect(counter).to eq(times_retrying)
     end
   end
 
