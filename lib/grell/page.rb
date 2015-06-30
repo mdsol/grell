@@ -48,8 +48,24 @@ module Grell
       unavailable_page(404, e)
     end
 
+    # Number of times we have retried the current page
     def retries
       [@times_visited -1, 0].max
+    end
+
+    # The current URL, this may be different from the URL we asked for if there was some redirect
+    def current_url
+      @rawpage.current_url
+    end
+
+    # True if we followed a redirect to get the current contents
+    def followed_redirects?
+      current_url != @url
+    end
+
+    # True if there page responded with an error
+    def error?
+      !!(status.to_s =~ /[4|5]\d\d/)
     end
 
     private
