@@ -5,6 +5,7 @@ module Grell
 
     def navigate(url)
       visit(url)
+      follow_redirects!
     end
 
     def headers
@@ -32,6 +33,19 @@ module Grell
 
     def has_selector?(selector)
       page.has_selector?(selector)
+    end
+
+    private
+
+    def follow_redirects!
+      # Phantom is very weird, it will follow a redirect to provide the correct body but will not fill the
+      # status and the headers, if we are in that situation, revisit the page with the correct url this time.
+      # Note that we will still fail if we have more than 5 redirects on a row
+      redirects = 0
+      while(page.status_code == nil && redirects < 5)
+        visit( CGI.unescape(page.current_url))
+        redirects = redirects + 1
+      end
     end
   end
 end

@@ -86,7 +86,7 @@ RSpec.describe Grell::Page do
   end
 
   shared_examples_for 'an errored grell page' do
-    it 'returns empty status 404 page after navigating' do 
+    it 'returns empty status 404 page after navigating' do
       expect(page.status).to eq(404)
       expect(page.links).to eq([])
       expect(page.headers).to eq(headers)
@@ -94,7 +94,7 @@ RSpec.describe Grell::Page do
       expect(page.has_selector?('html')).to eq(false)
       expect(page).to be_visited
       expect(page.timestamp).to eq(now)
-      #expect_any_instance_of(Logger).to receive(:warn) #.with(/The page with the URL #{url} was not available"/)
+      expect(page.error?).to eq(true)
     end
   end
 
@@ -153,6 +153,30 @@ RSpec.describe Grell::Page do
 
   end
 
+  context 'navigating to an URL with redirects, follows them transparently' do
+    let(:visited) {true}
+    let(:status) { 200}
+    let(:body) {'<html><head></head><body>nothing cool</body></html>'}
+    let(:links) {[]}
+    let(:expected_headers) {returned_headers}
+    let(:real_url) {'http://example.com/other'}
+    before do
+      proxy.stub(url).and_return(:redirect_to => real_url)
+      proxy.stub(real_url).and_return(body: body, code: status, headers: returned_headers.dup)
+      page.navigate
+    end
+    it_behaves_like 'a grell page'
+
+    it 'followed_redirects? is true' do
+      expect(page.followed_redirects?).to eq(true)
+    end
+
+    it 'current_url match the url we were redirected to' do
+      expect(page.current_url).to eq(real_url)
+    end
+  end
+
+  #Here also add examples that may happen for almost all pages (no errors, no redirects)
   context 'navigating to the URL we get page with no links' do
     let(:visited) {true}
     let(:status) { 200}
@@ -166,6 +190,18 @@ RSpec.describe Grell::Page do
     end
 
     it_behaves_like 'a grell page'
+
+    it 'followed_redirects is false' do
+      expect(page.followed_redirects?).to eq(false)
+    end
+
+    it 'current_url is url' do
+      expect(page.current_url).to eq(url)
+    end
+
+    it 'does not have errors' do
+      expect(page.error?).to eq(false)
+    end
   end
 
   context 'navigating to the URL we get page with links using a elements' do
@@ -238,7 +274,7 @@ RSpec.describe Grell::Page do
       </body></html>"
     end
     let(:links) do
-      ["http://www.example.com/trusmis.html", "http://www.example.com/help.html", 
+      ["http://www.example.com/trusmis.html", "http://www.example.com/help.html",
        'http://www.example.com/more_help.html', 'http://www.example.com/help_me.html'
       ]
     end

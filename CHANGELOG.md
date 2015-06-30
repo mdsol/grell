@@ -1,3 +1,7 @@
+* Version 1.5.0
+  Grell will follow redirects.
+  Added #followed_redirects? #error? #current_url methods to the Page class
+
 * Version 1.4.0
   Added crawler.restart to restart browser process
   The block of code can make grell retry any given page.
