@@ -22,7 +22,7 @@ module Grell
          })
       end
 
-      Capybara.default_wait_time = 3
+      Capybara.default_max_wait_time = 3
       Capybara.run_server = false
       Capybara.default_driver = :poltergeist_crawler
       page.driver.headers = {
