@@ -1,3 +1,7 @@
+* Version 1.5.1
+  Fixed deprecation warning (Thanks scott)
+  Updated Poltergeist dependency
+
 * Version 1.5.0
   Grell will follow redirects.
   Added #followed_redirects? #error? #current_url methods to the Page class
