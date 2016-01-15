@@ -1,3 +1,6 @@
+* Version 1.5.2
+  Don't rescue Timeout error, so that Delayed Job can properly terminate hanging jobs
+
 * Version 1.5.1
   Fixed deprecation warning (Thanks scott)
   Updated Poltergeist dependency
