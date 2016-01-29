@@ -15,8 +15,6 @@ module Grell
       else
         Grell.logger = Logger.new(STDOUT)
       end
-
-      @collection = PageCollection.new
     end
 
     # Restarts the PhantomJS process without modifying the state of visited and discovered pages.
@@ -37,13 +35,15 @@ module Grell
     end
 
     # Main method, it starts crawling on the given URL and calls a block for each of the pages found.
-    def start_crawling(url, &block)
+    def start_crawling(url, options = {}, &block)
       Grell.logger.info "GRELL Started crawling"
-      @collection = PageCollection.new
+      @collection = PageCollection.new(options[:add_match_block] || default_add_match)
       @collection.create_page(url, nil)
+
       while !@collection.discovered_pages.empty?
         crawl(@collection.next_page, block)
       end
+
       Grell.logger.info "GRELL finished crawling"
     end
 
@@ -53,7 +53,7 @@ module Grell
       filter!(site.links)
 
       if block #The user of this block can send us a :retry to retry accessing the page
-        while(block.call(site) == :retry)
+        while block.call(site) == :retry
           Grell.logger.info "Retrying our visit to #{site.url}"
           site.navigate
           filter!(site.links)
@@ -66,9 +66,18 @@ module Grell
     end
 
     private
+
     def filter!(links)
-      links.select!{ |link| link =~ @whitelist_regexp } if @whitelist_regexp
-      links.delete_if{ |link| link =~ @blacklist_regexp } if @blacklist_regexp
+      links.select! { |link| link =~ @whitelist_regexp } if @whitelist_regexp
+      links.delete_if { |link| link =~ @blacklist_regexp } if @blacklist_regexp
+    end
+
+    # If options[:add_match_block] is not provided, url matching to determine if a
+    # new page should be added the page collection will default to this proc
+    def default_add_match
+      Proc.new do |collection_page, page|
+        collection_page.url.downcase == page.url.downcase
+      end
     end
 
   end

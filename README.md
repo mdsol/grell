@@ -80,6 +80,26 @@ your are crawling. It will never follow links linking outside your site.
 If you want to further limit the amount of links crawled, you can use
 whitelisting, blacklisting or manual filtering.
 
+#### Custom URL Comparison
+By default, Grell will detect new URLs to visit by comparing the full URL
+with the URLs of the discovered and visited links. This functionality can
+be changed by passing a block of code to Grells `start_crawling` method.
+In the below example, the path of the URLs (instead of the full URL) will
+be compared.
+
+```ruby
+require 'grell'
+
+crawler = Grell::Crawler.new
+
+add_match_block = Proc.new do |collection_page, page|
+  collection_page.path == page.path
+end
+
+crawler.start_crawling('http://www.google.com', add_match_block: add_match_block) do |current_page|
+...
+end
+```
 
 #### Whitelisting
 

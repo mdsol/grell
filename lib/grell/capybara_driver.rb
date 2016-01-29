@@ -30,7 +30,7 @@ module Grell
         "User-Agent" => USER_AGENT
       }
 
-      fail "Poltergeis Driver could not be properly initialized" unless @poltergeist_driver
+      fail "Poltergeist Driver could not be properly initialized" unless @poltergeist_driver
 
       @poltergeist_driver
     end

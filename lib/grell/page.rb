@@ -66,6 +66,13 @@ module Grell
       !!(status.to_s =~ /[4|5]\d\d/)
     end
 
+    # Extracts the path (e.g. /actions/test_action) from the URL
+    def path
+      URI.parse(@url).path
+    rescue URI::InvalidURIError # Invalid URLs will be added and caught when we try to navigate to them
+      @url
+    end
+
     private
     def unavailable_page(status, exception)
       Grell.logger.warn "The page with the URL #{@url} was not available. Exception #{exception}"
