@@ -12,9 +12,8 @@ module Grell
     end
 
     def setup_capybara
-      @poltergeist_driver = nil
       Capybara.register_driver :poltergeist_crawler do |app|
-        @poltergeist_driver = Capybara::Poltergeist::Driver.new(app, {
+        Capybara::Poltergeist::Driver.new(app, {
           js_errors: false,
           inspector: false,
           phantomjs_logger: open('/dev/null'),
@@ -29,7 +28,10 @@ module Grell
         "DNT" => 1,
         "User-Agent" => USER_AGENT
       }
-      @poltergeist_driver
+
+      fail "Poltergeist Driver could not be properly initialized" unless Capybara.drivers[:poltergeist_crawler]
+
+      Capybara.drivers[:poltergeist_crawler].yield
     end
   end
 
