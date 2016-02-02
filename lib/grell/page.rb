@@ -68,12 +68,13 @@ module Grell
       !!(status.to_s =~ /[4|5]\d\d/)
     end
 
-    private
     def unavailable_page(status, exception)
       Grell.logger.warn "The page with the URL #{@url} was not available. Exception #{exception}"
       @result_page = ErroredPage.new(status, exception)
       @timestamp = Time.now
     end
+
+    private
 
     # Private class.
     # This is a result page when it has not been visited yet. Essentially empty of information

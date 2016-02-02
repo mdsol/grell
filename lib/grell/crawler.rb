@@ -45,9 +45,6 @@ module Grell
         crawl(@collection.next_page, block)
       end
       Grell.logger.info "GRELL finished crawling"
-    rescue => e
-      Grell.logger.info "GRELL caught exception in start_crawling: #{e.inspect}
-      raise
     end
 
     def crawl(site, block)
@@ -57,20 +54,22 @@ module Grell
       add_redirect_url(site)
 
       if block #The user of this block can send us a :retry to retry accessing the page
-        while(block.call(site) == :retry)
-          Grell.logger.info "Retrying our visit to #{site.url}"
-          site.navigate
-          filter!(site.links)
-          add_redirect_url(site)
+        begin
+          while block.call(site) == :retry
+            Grell.logger.info "Retrying our visit to #{site.url}"
+            site.navigate
+            filter!(site.links)
+            add_redirect_url(site)
+          end
+        rescue => e
+          site.unavailable_page(404, e)
+          return
         end
       end
 
       site.links.each do |url|
         @collection.create_page(url, site.id)
       end
-    rescue => e
-      Grell.logger.info "GRELL caught exception in crawl: #{e.inspect}
-      raise
     end
 
     private
