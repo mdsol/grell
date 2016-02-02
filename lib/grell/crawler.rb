@@ -51,12 +51,14 @@ module Grell
       Grell.logger.info "Visiting #{site.url}, visited_links: #{@collection.visited_pages.size}, discovered #{@collection.discovered_pages.size}"
       site.navigate
       filter!(site.links)
+      add_redirect_url(site)
 
       if block #The user of this block can send us a :retry to retry accessing the page
         while(block.call(site) == :retry)
           Grell.logger.info "Retrying our visit to #{site.url}"
           site.navigate
           filter!(site.links)
+          add_redirect_url(site)
         end
       end
 
@@ -66,9 +68,17 @@ module Grell
     end
 
     private
+
     def filter!(links)
       links.select!{ |link| link =~ @whitelist_regexp } if @whitelist_regexp
       links.delete_if{ |link| link =~ @blacklist_regexp } if @blacklist_regexp
+    end
+
+    # Keep track of the
+    def add_redirect_url(site)
+      if site.url != site.current_url
+        @collection.create_page(site.current_url, site.id)
+      end
     end
 
   end
