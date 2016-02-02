@@ -45,6 +45,9 @@ module Grell
         crawl(@collection.next_page, block)
       end
       Grell.logger.info "GRELL finished crawling"
+    rescue => e
+      Grell.logger.info "GRELL caught exception in start_crawling: #{e.inspect}
+      raise
     end
 
     def crawl(site, block)
@@ -65,6 +68,9 @@ module Grell
       site.links.each do |url|
         @collection.create_page(url, site.id)
       end
+    rescue => e
+      Grell.logger.info "GRELL caught exception in crawl: #{e.inspect}
+      raise
     end
 
     private
