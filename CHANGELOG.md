@@ -1,3 +1,7 @@
+# 1.6.1
+  * Use non-static name to support registering Poltergeist crawler multiple times
+  * More exception handling, store redirected URLs in addition to original URL
+
 # 1.6
   * Support custom URL comparison when adding new pages during crawling
   * Don't rescue Timeout error, so that Delayed Job can properly terminate hanging jobs
