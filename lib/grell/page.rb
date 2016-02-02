@@ -44,8 +44,6 @@ module Grell
       unavailable_page(404, e)
     rescue Capybara::Poltergeist::StatusFailError => e
       unavailable_page(404, e)
-    rescue Timeout::Error => e #This error inherits from Interruption, do not inherit from StandardError
-      unavailable_page(404, e)
     end
 
     # Number of times we have retried the current page
@@ -66,6 +64,13 @@ module Grell
     # True if there page responded with an error
     def error?
       !!(status.to_s =~ /[4|5]\d\d/)
+    end
+
+    # Extracts the path (e.g. /actions/test_action) from the URL
+    def path
+      URI.parse(@url).path
+    rescue URI::InvalidURIError # Invalid URLs will be added and caught when we try to navigate to them
+      @url
     end
 
     private

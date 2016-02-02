@@ -29,6 +29,9 @@ module Grell
         "DNT" => 1,
         "User-Agent" => USER_AGENT
       }
+
+      fail "Poltergeist Driver could not be properly initialized" unless @poltergeist_driver
+
       @poltergeist_driver
     end
   end

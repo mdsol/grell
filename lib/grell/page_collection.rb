@@ -6,8 +6,11 @@ module Grell
   class PageCollection
     attr_reader :collection
 
-    def initialize
+    # A block containing the logic that determines if a new URL should be added
+    # to the collection or if it is already present will be passed to the initializer.
+    def initialize(add_match_block)
       @collection = []
+      @add_match_block = add_match_block
     end
 
     def create_page(url, parent_id)
@@ -39,8 +42,9 @@ module Grell
       # Although finding unique pages based on URL will add pages with different query parameters,
       # in some cases we do link to different pages depending on the query parameters like when using proxies
       new_url = @collection.none? do |collection_page|
-        collection_page.url.downcase == page.url.downcase
+        @add_match_block.call(collection_page, page)
       end
+
       if new_url
         @collection.push page
       end
