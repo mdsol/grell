@@ -14,7 +14,7 @@ module Grell
     def setup_capybara
       @poltergeist_driver = nil
 
-      driver_name = "poltergeist_crawler_#{Time.now.strftime('%m_%d_%y_%H_%M')}".to_sym
+      driver_name = "poltergeist_crawler_#{Time.now.strftime('%m_%d_%y_%H_%M_%S')}".to_sym
       Capybara.register_driver driver_name do |app|
         @poltergeist_driver = Capybara::Poltergeist::Driver.new(app, {
           js_errors: false,
