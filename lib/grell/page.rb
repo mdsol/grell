@@ -34,19 +34,9 @@ module Grell
       @result_page = VisitedPage.new(@rawpage)
       @timestamp = Time.now
       @times_visited += 1
-    rescue Capybara::Poltergeist::JavascriptError => e
-      unavailable_page(404, e)
-    rescue Capybara::Poltergeist::BrowserError => e # This may happen internally on Poltergeist, they claim is a bug.
-      unavailable_page(404, e)
-    rescue URI::InvalidURIError => e # No cool URL means we report error
-      unavailable_page(404, e)
-    rescue Capybara::Poltergeist::TimeoutError => e # Poltergeist has its own timeout which is similar to Chromes.
-      unavailable_page(404, e)
-    rescue Capybara::Poltergeist::DeadClient => e
-      unavailable_page(404, e)
-    rescue Capybara::Poltergeist::StatusFailError => e
-      unavailable_page(404, e)
-    rescue Timeout::Error => e # This error inherits from Interruption, do not inherit from StandardError
+    rescue Capybara::Poltergeist::BrowserError, Capybara::Poltergeist::DeadClient,
+           Capybara::Poltergeist::JavascriptError, Capybara::Poltergeist::StatusFailError,
+           Capybara::Poltergeist::TimeoutError, Errno::ECONNRESET, Timeout::Error, URI::InvalidURIError => e
       unavailable_page(404, e)
     end
 
