@@ -36,7 +36,7 @@ module Grell
       @times_visited += 1
     rescue Capybara::Poltergeist::BrowserError, Capybara::Poltergeist::DeadClient,
            Capybara::Poltergeist::JavascriptError, Capybara::Poltergeist::StatusFailError,
-           Capybara::Poltergeist::TimeoutError, Errno::ECONNRESET, Timeout::Error, URI::InvalidURIError => e
+           Capybara::Poltergeist::TimeoutError, Errno::ECONNRESET, URI::InvalidURIError => e
       unavailable_page(404, e)
     end
 

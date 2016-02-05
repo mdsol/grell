@@ -8,13 +8,13 @@ module Grell
     # Creates a crawler
     # options allows :logger to point to an object with the same interface than Logger in the standard library
     def initialize(options = {})
-      @driver = CapybaraDriver.setup(options)
-
       if options[:logger]
         Grell.logger = options[:logger]
       else
         Grell.logger = Logger.new(STDOUT)
       end
+
+      @driver = CapybaraDriver.setup(options)
     end
 
     # Restarts the PhantomJS process without modifying the state of visited and discovered pages.
@@ -63,7 +63,7 @@ module Grell
           end
         rescue Capybara::Poltergeist::BrowserError, Capybara::Poltergeist::DeadClient,
                Capybara::Poltergeist::JavascriptError, Capybara::Poltergeist::StatusFailError,
-               Capybara::Poltergeist::TimeoutError, Errno::ECONNRESET, Timeout::Error, URI::InvalidURIError => e
+               Capybara::Poltergeist::TimeoutError, Errno::ECONNRESET, URI::InvalidURIError => e
           site.unavailable_page(404, e)
           return
         end

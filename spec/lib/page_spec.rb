@@ -106,7 +106,8 @@ RSpec.describe Grell::Page do
   end
 
   [ Capybara::Poltergeist::JavascriptError, Capybara::Poltergeist::BrowserError, URI::InvalidURIError,
-    Capybara::Poltergeist::TimeoutError, Capybara::Poltergeist::StatusFailError ].each do |error_type|
+    Capybara::Poltergeist::TimeoutError, Capybara::Poltergeist::StatusFailError,
+    Capybara::Poltergeist::DeadClient, Errno::ECONNRESET ].each do |error_type|
 
     context "#{error_type}" do
       let(:headers) do
