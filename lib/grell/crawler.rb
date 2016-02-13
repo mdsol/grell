@@ -54,18 +54,11 @@ module Grell
       add_redirect_url(site)
 
       if block # The user of this block can send us a :retry to retry accessing the page
-        begin
-          while block.call(site) == :retry
-            Grell.logger.info "Retrying our visit to #{site.url}"
-            site.navigate
-            filter!(site.links)
-            add_redirect_url(site)
-          end
-        rescue Capybara::Poltergeist::BrowserError, Capybara::Poltergeist::DeadClient,
-               Capybara::Poltergeist::JavascriptError, Capybara::Poltergeist::StatusFailError,
-               Capybara::Poltergeist::TimeoutError, Errno::ECONNRESET, URI::InvalidURIError => e
-          site.unavailable_page(404, e)
-          return
+        while crawl_block(block, site) == :retry
+          Grell.logger.info "Retrying our visit to #{site.url}"
+          site.navigate
+          filter!(site.links)
+          add_redirect_url(site)
         end
       end
 
@@ -75,6 +68,15 @@ module Grell
     end
 
     private
+
+    # Treat any exceptions from the block as an unavailable page
+    def crawl_block(block, site)
+      block.call(site)
+    rescue Capybara::Poltergeist::BrowserError, Capybara::Poltergeist::DeadClient,
+           Capybara::Poltergeist::JavascriptError, Capybara::Poltergeist::StatusFailError,
+           Capybara::Poltergeist::TimeoutError, Errno::ECONNRESET, URI::InvalidURIError => e
+      site.unavailable_page(404, e)
+    end
 
     def filter!(links)
       links.select! { |link| link =~ @whitelist_regexp } if @whitelist_regexp

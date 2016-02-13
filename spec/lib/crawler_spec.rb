@@ -46,6 +46,7 @@ RSpec.describe Grell::Crawler do
     it 'rescues any specified exceptions raised during the block execution' do
       block = Proc.new { |n| raise Capybara::Poltergeist::BrowserError, 'Exception' }
       expect{ crawler.crawl(page, block) }.to_not raise_error
+      expect(page.status).to eq(404)
     end
 
     it 'logs interesting information' do
