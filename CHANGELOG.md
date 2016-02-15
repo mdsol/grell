@@ -1,3 +1,6 @@
+# Next Release
+  * Reset Capybara driver to Puffing Billy (used to rewrite URL requests in specs)
+
 # 1.6.1
   * Use non-static name to support registering Poltergeist crawler multiple times
   * More exception handling, store redirected URLs in addition to original URL

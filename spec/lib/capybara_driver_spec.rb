@@ -26,6 +26,10 @@ RSpec.describe Grell::CapybaraDriver do
 
     after do
       Timecop.return
+
+      # Reset Capybara so future tests can easily stub HTTP requests
+      Capybara.javascript_driver = :poltergeist_billy
+      Capybara.default_driver = :poltergeist_billy
     end
   end
 
