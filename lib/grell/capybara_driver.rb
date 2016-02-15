@@ -13,7 +13,13 @@ module Grell
 
     def setup_capybara
       @poltergeist_driver = nil
-      Capybara.register_driver :poltergeist_crawler do |app|
+
+      # Capybara will not re-run the block if the driver name already exists, so the driver name
+      # will have a time integer appended to ensure uniqueness.
+      driver_name = "poltergeist_crawler_#{Time.now.to_i}".to_sym
+      Grell.logger.info "GRELL Registering poltergeist driver with name '#{driver_name}'"
+
+      Capybara.register_driver driver_name do |app|
         @poltergeist_driver = Capybara::Poltergeist::Driver.new(app, {
           js_errors: false,
           inspector: false,
@@ -24,13 +30,13 @@ module Grell
 
       Capybara.default_max_wait_time = 3
       Capybara.run_server = false
-      Capybara.default_driver = :poltergeist_crawler
+      Capybara.default_driver = driver_name
       page.driver.headers = {
         "DNT" => 1,
         "User-Agent" => USER_AGENT
       }
 
-      fail "Poltergeist Driver could not be properly initialized" unless @poltergeist_driver
+      raise 'Poltergeist Driver could not be properly initialized' unless @poltergeist_driver
 
       @poltergeist_driver
     end

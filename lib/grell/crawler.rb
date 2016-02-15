@@ -8,13 +8,13 @@ module Grell
     # Creates a crawler
     # options allows :logger to point to an object with the same interface than Logger in the standard library
     def initialize(options = {})
-      @driver = CapybaraDriver.setup(options)
-
       if options[:logger]
         Grell.logger = options[:logger]
       else
         Grell.logger = Logger.new(STDOUT)
       end
+
+      @driver = CapybaraDriver.setup(options)
     end
 
     # Restarts the PhantomJS process without modifying the state of visited and discovered pages.
@@ -51,12 +51,14 @@ module Grell
       Grell.logger.info "Visiting #{site.url}, visited_links: #{@collection.visited_pages.size}, discovered #{@collection.discovered_pages.size}"
       site.navigate
       filter!(site.links)
+      add_redirect_url(site)
 
-      if block #The user of this block can send us a :retry to retry accessing the page
-        while block.call(site) == :retry
+      if block # The user of this block can send us a :retry to retry accessing the page
+        while crawl_block(block, site) == :retry
           Grell.logger.info "Retrying our visit to #{site.url}"
           site.navigate
           filter!(site.links)
+          add_redirect_url(site)
         end
       end
 
@@ -66,6 +68,15 @@ module Grell
     end
 
     private
+
+    # Treat any exceptions from the block as an unavailable page
+    def crawl_block(block, site)
+      block.call(site)
+    rescue Capybara::Poltergeist::BrowserError, Capybara::Poltergeist::DeadClient,
+           Capybara::Poltergeist::JavascriptError, Capybara::Poltergeist::StatusFailError,
+           Capybara::Poltergeist::TimeoutError, Errno::ECONNRESET, URI::InvalidURIError => e
+      site.unavailable_page(404, e)
+    end
 
     def filter!(links)
       links.select! { |link| link =~ @whitelist_regexp } if @whitelist_regexp
@@ -77,6 +88,13 @@ module Grell
     def default_add_match
       Proc.new do |collection_page, page|
         collection_page.url.downcase == page.url.downcase
+      end
+    end
+
+    # Store the resulting redirected URL along with the original URL
+    def add_redirect_url(site)
+      if site.url != site.current_url
+        @collection.create_page(site.current_url, site.id)
       end
     end
 

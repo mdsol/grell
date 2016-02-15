@@ -36,11 +36,17 @@ RSpec.describe Grell::Crawler do
 
     it 'yields the result if a block is given' do
       result = []
-      block = Proc.new {|n| result.push(n) }
+      block = Proc.new { |n| result.push(n) }
       crawler.crawl(page, block)
       expect(result.size).to eq(1)
       expect(result.first.url).to eq(url)
       expect(result.first.visited?).to eq(true)
+    end
+
+    it 'rescues any specified exceptions raised during the block execution' do
+      block = Proc.new { |n| raise Capybara::Poltergeist::BrowserError, 'Exception' }
+      expect{ crawler.crawl(page, block) }.to_not raise_error
+      expect(page.status).to eq(404)
     end
 
     it 'logs interesting information' do
@@ -61,6 +67,13 @@ RSpec.describe Grell::Crawler do
       crawler.crawl(page, block)
       expect(counter).to eq(times_retrying)
     end
+
+    it 'handles redirects by adding the current_url to the page collection' do
+      redirect_url = 'http://www.example.com/test/landing_page'
+      allow(page).to receive(:current_url).and_return(redirect_url)
+      expect_any_instance_of(Grell::PageCollection).to receive(:create_page).with(redirect_url, page_id)
+      crawler.crawl(page, nil)
+    end
   end
 
   context '#start_crawling' do
@@ -80,7 +93,7 @@ RSpec.describe Grell::Crawler do
 
     it 'calls the block we used to start_crawling' do
       result = []
-      block = Proc.new {|n| result.push(n) }
+      block = Proc.new { |n| result.push(n) }
       crawler.start_crawling(url, &block)
       expect(result.size).to eq(2)
       expect(result[0].url).to eq(url)

@@ -34,15 +34,9 @@ module Grell
       @result_page = VisitedPage.new(@rawpage)
       @timestamp = Time.now
       @times_visited += 1
-    rescue Capybara::Poltergeist::JavascriptError => e
-      unavailable_page(404, e)
-    rescue Capybara::Poltergeist::BrowserError => e #This may happen internally on Poltergeist, they claim is a bug.
-      unavailable_page(404, e)
-    rescue URI::InvalidURIError => e #No cool URL means we report error
-      unavailable_page(404, e)
-    rescue Capybara::Poltergeist::TimeoutError => e #Poltergeist has its own timeout which is similar to Chromes.
-      unavailable_page(404, e)
-    rescue Capybara::Poltergeist::StatusFailError => e
+    rescue Capybara::Poltergeist::BrowserError, Capybara::Poltergeist::DeadClient,
+           Capybara::Poltergeist::JavascriptError, Capybara::Poltergeist::StatusFailError,
+           Capybara::Poltergeist::TimeoutError, Errno::ECONNRESET, URI::InvalidURIError => e
       unavailable_page(404, e)
     end
 
@@ -73,12 +67,13 @@ module Grell
       @url
     end
 
-    private
     def unavailable_page(status, exception)
       Grell.logger.warn "The page with the URL #{@url} was not available. Exception #{exception}"
       @result_page = ErroredPage.new(status, exception)
       @timestamp = Time.now
     end
+
+    private
 
     # Private class.
     # This is a result page when it has not been visited yet. Essentially empty of information
