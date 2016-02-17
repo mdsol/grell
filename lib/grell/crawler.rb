@@ -19,9 +19,16 @@ module Grell
 
     # Restarts the PhantomJS process without modifying the state of visited and discovered pages.
     def restart
-      Grell.logger.info "GRELL is restarting"
-      @driver.restart
-      Grell.logger.info "GRELL has restarted"
+      5.times do
+        begin
+          Grell.logger.info "GRELL is restarting"
+          @driver.restart
+          Grell.logger.info "GRELL has restarted"
+          break
+        rescue => e
+          Grell.logger.info "GRELL failed to restart driver: #{e.inspect}"
+        end
+      end
     end
 
     # Setups a whitelist filter, allows a regexp, string or array of either to be matched.
