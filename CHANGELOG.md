@@ -1,5 +1,6 @@
-# Next Release
+# 1.6.2
   * Reset Capybara driver to Puffing Billy (used to rewrite URL requests in specs)
+  * Use float timestamp for Poltergeist driver name to support fast test executions
 
 # 1.6.1
   * Use non-static name to support registering Poltergeist crawler multiple times

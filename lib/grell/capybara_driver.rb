@@ -16,7 +16,7 @@ module Grell
 
       # Capybara will not re-run the block if the driver name already exists, so the driver name
       # will have a time integer appended to ensure uniqueness.
-      driver_name = "poltergeist_crawler_#{Time.now.to_i}".to_sym
+      driver_name = "poltergeist_crawler_#{Time.now.to_f}".to_sym
       Grell.logger.info "GRELL Registering poltergeist driver with name '#{driver_name}'"
 
       Capybara.register_driver driver_name do |app|
