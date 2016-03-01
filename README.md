@@ -1,5 +1,7 @@
 # Grell
 
+[![Build Status](https://travis-ci.org/mdsol/grell.svg?branch=develop)](https://travis-ci.org/mdsol/grell)
+
 Grell is a generic crawler for the web written in Ruby.
 It can be used to gather data, test pages in a given domain, etc.
 
