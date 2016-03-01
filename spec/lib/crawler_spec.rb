@@ -21,6 +21,7 @@ RSpec.describe Grell::Crawler do
     it 'can provide your own logger' do
       Grell::Crawler.new(external_driver: true, logger: 33)
       expect(Grell.logger).to eq(33)
+      Grell.logger = Logger.new(nil)
     end
 
     it 'provides a stdout logger if nothing provided' do
