@@ -23,7 +23,8 @@ module Grell
     def all_anchors
       # Some elements may not be "a" elements but still provide a link. This usually is done for Javascript
       # to convert other elements which are not links to be able to be clicked naturally.
-      all('[href]', visible: false).to_a + all('[data-href]', visible: false).to_a
+      # Only return links which are visible.
+      all('[href]', visible: true).to_a + all('[data-href]', visible: true).to_a
     end
 
 
