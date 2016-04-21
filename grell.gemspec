@@ -21,8 +21,8 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 1.9.3'
 
-  spec.add_dependency 'capybara', '~> 2.2'
-  spec.add_dependency 'poltergeist', '~> 1.8'
+  spec.add_dependency 'capybara', '~> 2.7'
+  spec.add_dependency 'poltergeist', '~> 1.9'
 
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "byebug", "~> 4.0"

@@ -1,3 +1,6 @@
+# 1.6.3
+  * Only follow visible links
+
 # 1.6.2
   * Reset Capybara driver to Puffing Billy (used to rewrite URL requests in specs)
   * Use float timestamp for Poltergeist driver name to support fast test executions
