@@ -24,6 +24,12 @@ module Grell
       Grell.logger.info "GRELL has restarted"
     end
 
+    # Quits the poltergeist driver.
+    def quit
+      Grell.logger.info "GRELL is quitting the poltergeist driver"
+      @driver.quit
+    end
+
     # Setups a whitelist filter, allows a regexp, string or array of either to be matched.
     def whitelist(list)
       @whitelist_regexp = Regexp.union(list)

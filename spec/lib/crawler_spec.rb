@@ -30,6 +30,16 @@ RSpec.describe Grell::Crawler do
     end
   end
 
+  describe '#quit' do
+    let(:driver) { double }
+    before { allow(Grell::CapybaraDriver).to receive(:setup).and_return(driver) }
+
+    it 'quits the poltergeist driver' do
+      expect(driver).to receive(:quit)
+      crawler.quit
+    end
+  end
+
   describe '#crawl' do
     before do
       crawler.instance_variable_set('@collection', Grell::PageCollection.new(custom_add_match))
