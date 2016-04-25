@@ -40,6 +40,10 @@ module Grell
 
       @poltergeist_driver
     end
+
+    def quit
+      @poltergeist_driver.quit
+    end
   end
 
 end

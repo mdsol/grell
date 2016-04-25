@@ -23,14 +23,21 @@ RSpec.describe Grell::CapybaraDriver do
       driver = Grell::CapybaraDriver.new.setup_capybara
       expect(driver).to be_instance_of(Capybara::Poltergeist::Driver)
     end
+  end
 
-    after do
-      Timecop.return
-
-      # Reset Capybara so future tests can easily stub HTTP requests
-      Capybara.javascript_driver = :poltergeist_billy
-      Capybara.default_driver = :poltergeist_billy
+  describe 'quit' do
+    let(:driver) { Grell::CapybaraDriver.new.setup_capybara }
+    it 'quits the poltergeist driver' do
+      expect_any_instance_of(Capybara::Poltergeist::Driver).to receive(:quit)
+      driver.quit
     end
   end
 
+  after do
+    Timecop.return
+
+    # Reset Capybara so future tests can easily stub HTTP requests
+    Capybara.javascript_driver = :poltergeist_billy
+    Capybara.default_driver = :poltergeist_billy
+  end
 end
