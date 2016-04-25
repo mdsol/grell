@@ -1,3 +1,6 @@
+# 1.6.5
+  * Added #quit to Crawler
+
 # 1.6.4
   * Added #quit to Capybara driver
 
