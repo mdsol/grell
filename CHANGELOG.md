@@ -1,3 +1,6 @@
+# 1.6.4
+  * Added #quit to Capybara driver
+
 # 1.6.3
   * Only follow visible links
 
