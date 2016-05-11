@@ -1,3 +1,6 @@
+# 1.6.6
+  * Updated phantomjs_logger not to open '/dev/null'
+
 # 1.6.5
   * Added #quit to Crawler
 
