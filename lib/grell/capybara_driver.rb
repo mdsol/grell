@@ -23,7 +23,7 @@ module Grell
         @poltergeist_driver = Capybara::Poltergeist::Driver.new(app, {
           js_errors: false,
           inspector: false,
-          phantomjs_logger: open('/dev/null'),
+          phantomjs_logger: FakePoltergeistLogger,
           phantomjs_options: ['--debug=no', '--load-images=no', '--ignore-ssl-errors=yes', '--ssl-protocol=TLSv1']
          })
       end
@@ -43,6 +43,11 @@ module Grell
 
     def quit
       @poltergeist_driver.quit
+    end
+
+    module FakePoltergeistLogger
+      def self.puts(*)
+      end
     end
   end
 
