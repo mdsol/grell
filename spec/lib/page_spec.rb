@@ -102,6 +102,7 @@ RSpec.describe Grell::Page do
       expect(page).to be_visited
       expect(page.timestamp).to eq(now)
       expect(page.error?).to eq(true)
+      expect(page.instance_variable_get(:@times_visited)).to eq(1)
     end
   end
 

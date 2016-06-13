@@ -1,3 +1,6 @@
+# 1.6.7
+  * Increment '@times_visited' first to avoid infinite retries when rescuing errors
+
 # 1.6.6
   * Updated phantomjs_logger not to open '/dev/null'
 
