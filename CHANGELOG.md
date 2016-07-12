@@ -1,3 +1,6 @@
+# 1.6.8
+  * Avoid following disabled links
+
 # 1.6.7
   * Increment '@times_visited' first to avoid infinite retries when rescuing errors
 

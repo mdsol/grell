@@ -206,9 +206,12 @@ module Grell
       private
       def all_links
         # <link> can only be used in the <head> as of: https://developer.mozilla.org/en/docs/Web/HTML/Element/link
-        anchors_in_body = @rawpage.all_anchors.reject{|anchor| anchor.tag_name == 'link' }
+        anchors_in_body = @rawpage.all_anchors.reject { |anchor| anchor.tag_name == 'link' }
 
-        unique_links = anchors_in_body.map do |anchor|
+        # Do not follow disabled links
+        enabled_links = anchors_in_body.reject { |anchor| anchor.disabled? }
+
+        unique_links = enabled_links.map do |anchor|
          anchor['href'] || anchor['data-href']
         end.compact
 
