@@ -243,6 +243,29 @@ RSpec.describe Grell::Page do
     end
   end
 
+
+  context 'navigating to the URL we get page with disabled links' do
+    let(:visited) { true }
+    let(:status) { 200 }
+    let(:body) do
+      "<html><head></head><body>
+      Hello world!
+      <a href=\"/trusmis.html\">trusmis</a>
+      <a href=\"/help.html\">help</a>
+      <a href=\"javascript: void(0)\">help</a>
+      </body></html>"
+    end
+    let(:links) { ['http://www.example.com/trusmis.html', 'http://www.example.com/help.html'] }
+    let(:expected_headers) { returned_headers }
+
+    before do
+      proxy.stub(url).and_return(body: body, code: status, headers: returned_headers.dup)
+      page.navigate
+    end
+
+    it_behaves_like 'a grell page'
+  end
+
   context 'navigating to the URL we get page with links with absolute links' do
     let(:visited) { true }
     let(:status) { 200 }
