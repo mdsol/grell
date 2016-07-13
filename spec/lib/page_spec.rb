@@ -253,6 +253,7 @@ RSpec.describe Grell::Page do
       <a href=\"/trusmis.html\">trusmis</a>
       <a href=\"/help.html\">help</a>
       <a href=\"javascript: void(0)\">help</a>
+      <a href=\"/helpdisabled.html\" disabled=\"\">helpdisabled</a>
       </body></html>"
     end
     let(:links) { ['http://www.example.com/trusmis.html', 'http://www.example.com/help.html'] }

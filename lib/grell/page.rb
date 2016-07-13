@@ -43,7 +43,7 @@ module Grell
 
     # Number of times we have retried the current page
     def retries
-      [@times_visited -1, 0].max
+      [@times_visited - 1, 0].max
     end
 
     # The current URL, this may be different from the URL we asked for if there was some redirect
@@ -205,17 +205,9 @@ module Grell
 
       private
       def all_links
-        # <link> can only be used in the <head> as of: https://developer.mozilla.org/en/docs/Web/HTML/Element/link
-        anchors_in_body = @rawpage.all_anchors.reject { |anchor| anchor.tag_name == 'link' }
-
-        # Do not follow disabled links
-        enabled_links = anchors_in_body.reject { |anchor| anchor.disabled? }
-
-        unique_links = enabled_links.map do |anchor|
-         anchor['href'] || anchor['data-href']
-        end.compact
-
-        unique_links.map{|link| link_to_url(link)}.uniq.compact
+        links =  @rawpage.all_anchors.map { |anchor| Link.new(anchor) }
+        body_enabled_links = links.reject { |link| link.inside_header? || link.disabled? }
+        body_enabled_links.map { |link| link.to_url(host) }.uniq.compact
 
       rescue Capybara::Poltergeist::ObsoleteNode
         Grell.logger.warn "We found an obsolete node in #{@url}. Ignoring all links"
@@ -224,37 +216,54 @@ module Grell
         []
       end
 
-      # We only accept links in this same host that start with a path
-      # nil from this
-      def link_to_url(link)
-        uri = URI.parse(link)
-        if uri.absolute?
-          if uri.host != URI.parse(host).host
-            Grell.logger.debug "GRELL does not follow links to external hosts: #{link}"
-            nil
-          else
-            link # Absolute link to our own host
-          end
-        else
-          if uri.path.nil?
-            Grell.logger.debug "GRELL does not follow links without a path: #{uri}"
-            nil
-          end
-          if uri.path.start_with?('/')
-            host + link  #convert to full URL
-          else #links like href="google.com" the browser would go to http://google.com like "http://#{link}"
-            Grell.logger.debug "GRELL Bad formatted link: #{link}, assuming external"
-            nil
-          end
+      # Private class to group all the methods related to links.
+      class Link
+        def initialize(anchor)
+          @anchor = anchor
         end
 
-      rescue URI::InvalidURIError #We will have invalid links propagating till we navigate to them
-        link
+        # <link> can only be used in the <head> as of: https://developer.mozilla.org/en/docs/Web/HTML/Element/link
+        def inside_header?
+          @anchor.tag_name == 'link'
+        end
+
+        # Is the link disabled by either Javascript or CSS?
+        def disabled?
+          @anchor.disabled? || !!@anchor.native.attributes['disabled']
+        end
+
+        # Some links may use data-href + javascript to do interesting things
+        def href
+          @anchor['href'] || @anchor['data-href']
+        end
+
+        # We only accept links in this same host that start with a path
+        def to_url(host)
+          uri = URI.parse(href)
+          if uri.absolute?
+            if uri.host != URI.parse(host).host
+              Grell.logger.debug "GRELL does not follow links to external hosts: #{href}"
+              nil
+            else
+              href # Absolute link to our own host
+            end
+          else
+            if uri.path.nil?
+              Grell.logger.debug "GRELL does not follow links without a path: #{uri}"
+              nil
+            end
+            if uri.path.start_with?('/')
+              host + href  # convert to full URL
+            else # links like href="google.com" the browser would go to http://google.com like "http://#{link}"
+              Grell.logger.debug "GRELL Bad formatted link: #{href}, assuming external"
+              nil
+            end
+          end
+        rescue URI::InvalidURIError # Invalid links propagating till we navigate to them
+          href
+        end
       end
+
     end
-
-
-
   end
-
 end
