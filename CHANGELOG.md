@@ -1,3 +1,5 @@
+# 1.6.9
+  * Avoid following links when disabled by CSS (1.6.8 worked only for Javascript)
 # 1.6.8
   * Avoid following disabled links
 
