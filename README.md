@@ -23,7 +23,7 @@ Or install it yourself as:
 
 Grell uses PhantomJS, you will need to download and install it in your
 system. Check for instructions in http://phantomjs.org/
-Grell has been tested with PhantomJS v1.9.x
+Grell has been tested with PhantomJS v2.1.x
 
 ## Usage
 
