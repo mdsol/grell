@@ -158,7 +158,7 @@ When there is an error in the page or an internal error in the crawler (Javascri
 - errorMessage: A descriptive message with the information Grell could gather about the error.
 
 ### Logging
-You can pass your logger to Grell. For example in a Rails app:
+You can pass your logger to Grell. For example, in a Rails app:
 ```Ruby
 crawler = Grell::Crawler.new(logger: Rails.logger)
 ```
