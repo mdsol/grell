@@ -1,5 +1,9 @@
+# 1.6.10
+  * Avoid following JS href links, add missing dependencies to fix Travis build
+
 # 1.6.9
   * Avoid following links when disabled by CSS (1.6.8 worked only for Javascript)
+
 # 1.6.8
   * Avoid following disabled links
 
