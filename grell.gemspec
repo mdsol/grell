@@ -24,12 +24,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'capybara', '~> 2.7'
   spec.add_dependency 'poltergeist', '~> 1.10'
 
-  spec.add_development_dependency "bundler", "~> 1.6"
-  spec.add_development_dependency "byebug", "~> 4.0"
-  spec.add_development_dependency "kender", '~> 0.2'
-  spec.add_development_dependency "rake", '~> 10.0'
-  spec.add_development_dependency "webmock", '~> 1.18'
+  spec.add_development_dependency 'bundler', '~> 1.6'
+  spec.add_development_dependency 'byebug', '~> 4.0'
+  spec.add_development_dependency 'kender', '~> 0.2'
+  spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_development_dependency 'webmock', '~> 1.18'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'puffing-billy', '~> 0.5'
   spec.add_development_dependency 'timecop', '~> 0.8'
+  spec.add_development_dependency 'capybara-webkit', '~> 1.11.1'
+  spec.add_development_dependency 'selenium-webdriver', '~> 2.53.4'
 end

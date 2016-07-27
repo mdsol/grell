@@ -206,7 +206,7 @@ module Grell
       private
       def all_links
         links =  @rawpage.all_anchors.map { |anchor| Link.new(anchor) }
-        body_enabled_links = links.reject { |link| link.inside_header? || link.disabled? }
+        body_enabled_links = links.reject { |link| link.inside_header? || link.disabled? || link.js_href? }
         body_enabled_links.map { |link| link.to_url(host) }.uniq.compact
 
       rescue Capybara::Poltergeist::ObsoleteNode
@@ -230,6 +230,11 @@ module Grell
         # Is the link disabled by either Javascript or CSS?
         def disabled?
           @anchor.disabled? || !!@anchor.native.attributes['disabled']
+        end
+
+        # Does the href use javascript?
+        def js_href?
+          href.start_with?('javascript:')
         end
 
         # Some links may use data-href + javascript to do interesting things

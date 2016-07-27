@@ -2,7 +2,7 @@ require 'grell'
 require 'byebug'
 require 'timecop'
 require 'webmock/rspec'
-require 'billy/rspec'
+require 'billy/capybara/rspec'
 require 'rack'
 require 'rack/server'
 
