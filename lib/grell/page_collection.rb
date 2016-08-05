@@ -13,15 +13,15 @@ module Grell
       @add_match_block = add_match_block
     end
 
-    def create_page(url, parent_id)
+    def create_page(url, parent_pages)
       page_id = next_id
-      page = Page.new(url, page_id, parent_id)
+      page = Page.new(url, page_id, parent_pages)
       add(page)
       page
     end
 
     def visited_pages
-      @collection.select {|page| page.visited?}
+      @collection.select { |page| page.visited? }
     end
 
     def discovered_pages
@@ -29,7 +29,7 @@ module Grell
     end
 
     def next_page
-      discovered_pages.sort_by{|page| page.parent_id}.first
+      discovered_pages.sort_by { |page| page.parent_id }.first
     end
 
     private

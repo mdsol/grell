@@ -68,8 +68,9 @@ module Grell
         end
       end
 
+      parent_pages = site.parent_pages || []
       site.links.each do |url|
-        @collection.create_page(url, site.id)
+        @collection.create_page(url, parent_pages + [site])
       end
     end
 
@@ -100,7 +101,8 @@ module Grell
     # Store the resulting redirected URL along with the original URL
     def add_redirect_url(site)
       if site.url != site.current_url
-        @collection.create_page(site.current_url, site.id)
+        parent_pages = site.parent_pages || []
+        @collection.create_page(site.current_url, parent_pages + [site])
       end
     end
 

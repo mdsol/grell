@@ -1,8 +1,8 @@
 RSpec.describe Grell::Page do
-
-  let(:page_id) { rand(10).floor + 10 }
   let(:parent_page_id) { rand(10).floor }
-  let(:page) { Grell::Page.new(url, page_id, parent_page_id) }
+  let(:parent_page) { Grell::Page.new(url, parent_page_id, nil) }
+  let(:page_id) { rand(10).floor + 10 }
+  let(:page) { Grell::Page.new(url, page_id, [parent_page]) }
   let(:host) { 'http://www.example.com' }
   let(:url) { 'http://www.example.com/test' }
   let(:returned_headers)  { { 'Other-Header' => 'yes', 'Content-Type' => 'text/html' }}
@@ -23,6 +23,10 @@ RSpec.describe Grell::Page do
 
   it 'gives access to the page id' do
     expect(page.id).to eq(page_id)
+  end
+
+  it 'gives access to the parent pages' do
+    expect(page.parent_pages).to eq([parent_page])
   end
 
   it 'gives access to the parent page id' do
@@ -326,7 +330,7 @@ RSpec.describe Grell::Page do
     describe '#path' do
       context 'proper url' do
         let(:url) { 'http://www.anyurl.com/path' }
-        let(:page) { Grell::Page.new(url, page_id, parent_page_id) }
+        let(:page) { Grell::Page.new(url, page_id, [parent_page]) }
 
         it 'returns the path' do
           expect(page.path).to eq('/path')
@@ -335,7 +339,7 @@ RSpec.describe Grell::Page do
 
       context 'broken url' do
         let(:url) { 'www.an.asda.fasfasf.yurl.com/path' }
-        let(:page) { Grell::Page.new(url, page_id, parent_page_id) }
+        let(:page) { Grell::Page.new(url, page_id, [parent_page]) }
 
         it 'returns the path' do
           expect(page.path).to eq(url)

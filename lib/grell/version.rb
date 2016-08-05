@@ -1,3 +1,3 @@
 module Grell
-  VERSION = "1.6.10".freeze
+  VERSION = "1.7.0".freeze
 end
