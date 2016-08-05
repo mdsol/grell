@@ -1,3 +1,6 @@
+# 1.7.0
+  * Each Page now stores all parent Page objects in `parent_pages`, as well as the most immediate parent ID
+
 # 1.6.10
   * Avoid following JS href links, add missing dependencies to fix Travis build
 

@@ -26,7 +26,7 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'one unvisited page' do
-    let(:page) { collection.create_page(url, 0) }
+    let(:page) { collection.create_page(url, nil) }
 
     before do
       allow(page).to receive(:visited?).and_return(false)
@@ -47,7 +47,7 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'one visited page' do
-    let(:page) { collection.create_page(url, 0) }
+    let(:page) { collection.create_page(url, nil) }
 
     before do
       allow(page).to receive(:visited?).and_return(true)
@@ -67,8 +67,8 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'one visited and one unvisited page with the same url' do
-    let(:page) { collection.create_page(url, 0) }
-    let(:unvisited) { collection.create_page(url.upcase, 0) }
+    let(:page) { collection.create_page(url, nil) }
+    let(:unvisited) { collection.create_page(url.upcase, nil) }
 
     before do
       allow(page).to receive(:visited?).and_return(true)
@@ -97,8 +97,8 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'one visited and one unvisited page with different URLs' do
-    let(:page) { collection.create_page(url, 0) }
-    let(:unvisited) { collection.create_page(url2, 0) }
+    let(:page) { collection.create_page(url, nil) }
+    let(:unvisited) { collection.create_page(url2, nil) }
 
     before do
       allow(page).to receive(:visited?).and_return(true)
@@ -119,9 +119,9 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'one visited and one unvisited page with different URLs only different by the query' do
-    let(:page) { collection.create_page(url, 0) }
+    let(:page) { collection.create_page(url, nil) }
     let(:url3) { 'http://www.github.com/SomeUser/dragonlance?search=true' }
-    let(:unvisited) { collection.create_page(url3, 0) }
+    let(:unvisited) { collection.create_page(url3, nil) }
 
     before do
       allow(page).to receive(:visited?).and_return(true)
@@ -142,8 +142,8 @@ RSpec.describe Grell::PageCollection do
   end
 
   context 'several unvisited pages' do
-    let(:page) { collection.create_page(url, 2) }
-    let(:page2) { collection.create_page(url2, 0) }
+    let(:page) { collection.create_page(url, [page2]) }
+    let(:page2) { collection.create_page(url2, nil) }
 
     before do
       allow(page).to receive(:visited?).and_return(true)

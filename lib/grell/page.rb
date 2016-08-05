@@ -10,16 +10,17 @@ module Grell
     WAIT_TIME = 10
     WAIT_INTERVAL = 0.5
 
-    attr_reader :url, :timestamp, :id, :parent_id, :rawpage
+    attr_reader :url, :timestamp, :id, :parent_id, :parent_pages, :rawpage
 
     #Most of the interesting information accessed through this class is accessed by the methods below
     def_delegators :@result_page, :headers, :body, :status, :links, :has_selector?, :host, :visited?
 
-    def initialize( url, id, parent_id)
+    def initialize( url, id, parent_pages)
       @rawpage = RawPage.new
       @url = url
       @id = id
-      @parent_id = parent_id
+      @parent_pages = parent_pages
+      @parent_id = @parent_pages.last.id if @parent_pages
       @timestamp = nil
       @times_visited = 0
       @result_page = UnvisitedPage.new
@@ -89,7 +90,7 @@ module Grell
       end
 
       def headers
-        {grellStatus: 'NotVisited' }
+        { grellStatus: 'NotVisited' }
       end
 
       def links
@@ -167,6 +168,7 @@ module Grell
     class VisitedPage
       def initialize(rawpage)
         @rawpage = rawpage
+        @headers = @rawpage.headers
       end
 
       def status
@@ -178,7 +180,7 @@ module Grell
       end
 
       def headers
-        @rawpage.headers
+        @headers
       rescue Capybara::Poltergeist::BrowserError => e #This may happen internally on Poltergeist, they claim is a bug.
         {
           grellStatus: 'Error',

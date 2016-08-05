@@ -1,8 +1,9 @@
 
 RSpec.describe Grell::Crawler do
-  let(:page_id) { rand(10).floor + 10 }
   let(:parent_page_id) { rand(10).floor }
-  let(:page) { Grell::Page.new(url, page_id, parent_page_id) }
+  let(:parent_page) { Grell::Page.new(url, parent_page_id, nil) }
+  let(:page_id) { rand(10).floor + 10 }
+  let(:page) { Grell::Page.new(url, page_id, [parent_page]) }
   let(:host) { 'http://www.example.com' }
   let(:url) { 'http://www.example.com/test' }
   let(:crawler) { Grell::Crawler.new(logger: Logger.new(nil), external_driver: true) }
@@ -82,7 +83,7 @@ RSpec.describe Grell::Crawler do
     it 'handles redirects by adding the current_url to the page collection' do
       redirect_url = 'http://www.example.com/test/landing_page'
       allow(page).to receive(:current_url).and_return(redirect_url)
-      expect_any_instance_of(Grell::PageCollection).to receive(:create_page).with(redirect_url, page_id)
+      expect_any_instance_of(Grell::PageCollection).to receive(:create_page).with(redirect_url, [parent_page, page])
       crawler.crawl(page, nil)
     end
   end
