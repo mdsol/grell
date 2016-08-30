@@ -27,13 +27,23 @@ module Grell
       all('[href]', visible: true).to_a + all('[data-href]', visible: true).to_a
     end
 
-
     def host
       page.current_host
     end
 
     def has_selector?(selector)
       page.has_selector?(selector)
+    end
+
+    def wait_for_all_ajax_requests(timeout, interval)
+      Timeout::timeout(timeout) do
+        (timeout / interval).ceil.times do
+          jquery_active = page.evaluate_script("typeof jQuery !== 'undefined' && jQuery.active;")
+          break if (!jquery_active || jquery_active.zero?)
+          sleep(interval)
+        end
+      end
+      true
     end
 
     private

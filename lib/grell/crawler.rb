@@ -15,6 +15,7 @@ module Grell
       end
 
       @driver = CapybaraDriver.setup(options)
+      @evaluate_in_each_page = options[:evaluate_in_each_page]
     end
 
     # Restarts the PhantomJS process without modifying the state of visited and discovered pages.
@@ -55,16 +56,12 @@ module Grell
 
     def crawl(site, block)
       Grell.logger.info "Visiting #{site.url}, visited_links: #{@collection.visited_pages.size}, discovered #{@collection.discovered_pages.size}"
-      site.navigate
-      filter!(site.links)
-      add_redirect_url(site)
+      crawl_site(site)
 
       if block # The user of this block can send us a :retry to retry accessing the page
         while crawl_block(block, site) == :retry
           Grell.logger.info "Retrying our visit to #{site.url}"
-          site.navigate
-          filter!(site.links)
-          add_redirect_url(site)
+          crawl_site(site)
         end
       end
 
@@ -74,6 +71,13 @@ module Grell
     end
 
     private
+
+    def crawl_site(site)
+      site.navigate
+      site.rawpage.page.evaluate_script(@evaluate_in_each_page) if @evaluate_in_each_page
+      filter!(site.links)
+      add_redirect_url(site)
+    end
 
     # Treat any exceptions from the block as an unavailable page
     def crawl_block(block, site)

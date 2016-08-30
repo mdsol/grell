@@ -92,6 +92,17 @@ RSpec.describe Grell::Page do
     end
   end
 
+  describe '#navigate' do
+    before do
+      proxy.stub(url).and_return(body: '', code: 200, headers: {})
+    end
+
+    it 'waits for all ajax requests' do
+      expect_any_instance_of(Grell::RawPage).to receive(:wait_for_all_ajax_requests).with(0, 0.5)
+      page.navigate
+    end
+  end
+
   shared_examples_for 'an errored grell page' do
     it 'returns empty status 404 page after navigating' do
       expect(page.status).to eq(404)

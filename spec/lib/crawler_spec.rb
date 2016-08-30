@@ -5,7 +5,8 @@ RSpec.describe Grell::Crawler do
   let(:page) { Grell::Page.new(url, page_id, parent_page_id) }
   let(:host) { 'http://www.example.com' }
   let(:url) { 'http://www.example.com/test' }
-  let(:crawler) { Grell::Crawler.new(logger: Logger.new(nil), external_driver: true) }
+  let(:crawler) { Grell::Crawler.new(logger: Logger.new(nil), external_driver: true, evaluate_in_each_page: script) }
+  let(:script) { nil }
   let(:body) { 'body' }
   let(:custom_add_match) do
     Proc.new do |collection_page, page|
@@ -84,6 +85,21 @@ RSpec.describe Grell::Crawler do
       allow(page).to receive(:current_url).and_return(redirect_url)
       expect_any_instance_of(Grell::PageCollection).to receive(:create_page).with(redirect_url, page_id)
       crawler.crawl(page, nil)
+    end
+
+    context 'without script' do
+      it 'does not evaluate a script' do
+        expect_any_instance_of(Capybara::Session).not_to receive(:evaluate_script)
+        crawler.crawl(page, nil)
+      end
+    end
+
+    context 'with script' do
+      let(:script) { "(typeof(jQuery)!='undefined') && $('.dropdown').addClass('open');" }
+      it 'evaluates a script' do
+        expect_any_instance_of(Capybara::Session).to receive(:evaluate_script).with(script)
+        crawler.crawl(page, nil)
+      end
     end
   end
 
