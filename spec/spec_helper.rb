@@ -23,6 +23,7 @@ RSpec.configure do |config|
   # We do not need to wait for pages to return all the data
   config.before do
     stub_const("Grell::Page::WAIT_TIME", 0)
+    allow_any_instance_of(Capybara::Session).to receive(:evaluate_script).and_return(nil)
   end
 
   config.expect_with :rspec do |expectations|

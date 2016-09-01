@@ -26,11 +26,12 @@ module Grell
     end
 
     def navigate
-      # We wait a maximum of WAIT_TIME seconds to get an HTML page. We try or best to workaround inconsistencies on poltergeist
+      # We wait a maximum of WAIT_TIME seconds to get an HTML page. We try our best to workaround inconsistencies on poltergeist
       Reader.wait_for(->{@rawpage.navigate(url)}, WAIT_TIME, WAIT_INTERVAL ) do
         @rawpage.status && !@rawpage.headers.empty? &&
           @rawpage.headers["Content-Type"] && @rawpage.headers["Content-Type"].include?('text/html').equal?(true)
       end
+      @rawpage.wait_for_all_ajax_requests(WAIT_TIME, WAIT_INTERVAL)
       @result_page = VisitedPage.new(@rawpage)
       @timestamp = Time.now
     rescue Capybara::Poltergeist::BrowserError, Capybara::Poltergeist::DeadClient,

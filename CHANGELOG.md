@@ -1,3 +1,7 @@
+# 1.6.11
+  * Ensure all links are loaded by waiting for Ajax requests to complete
+  * Add '@evaluate_in_each_page' option to evaluate before extracting links (e.g. $('.dropdown').addClass('open');)
+
 # 1.6.10
   * Avoid following JS href links, add missing dependencies to fix Travis build
 
