@@ -24,7 +24,8 @@ module Grell
           js_errors: false,
           inspector: false,
           phantomjs_logger: FakePoltergeistLogger,
-          phantomjs_options: ['--debug=no', '--load-images=no', '--ignore-ssl-errors=yes', '--ssl-protocol=TLSv1']
+          phantomjs_options: ['--debug=no', '--load-images=no', '--ignore-ssl-errors=yes', '--ssl-protocol=TLSv1'],
+          timeout: 60
          })
       end
 
