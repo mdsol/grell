@@ -10,7 +10,7 @@ module Grell
     # to the collection or if it is already present will be passed to the initializer.
     def initialize(add_match_block)
       @collection = []
-      @add_match_block = add_match_block
+      @add_match_block = add_match_block || default_add_match
     end
 
     def create_page(url, parent_id)
@@ -47,6 +47,14 @@ module Grell
 
       if new_url
         @collection.push page
+      end
+    end
+
+    # If add_match_block is not provided, url matching to determine if a new page should be added
+    # to the page collection will default to this proc
+    def default_add_match
+      Proc.new do |collection_page, page|
+        collection_page.url.downcase == page.url.downcase
       end
     end
 

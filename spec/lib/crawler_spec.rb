@@ -5,7 +5,14 @@ RSpec.describe Grell::Crawler do
   let(:page) { Grell::Page.new(url, page_id, parent_page_id) }
   let(:host) { 'http://www.example.com' }
   let(:url) { 'http://www.example.com/test' }
-  let(:crawler) { Grell::Crawler.new(logger: Logger.new(nil), external_driver: true, evaluate_in_each_page: script) }
+  let(:add_match_block) { nil }
+  let(:crawler) do
+    Grell::Crawler.new(
+      logger: Logger.new(nil),
+      external_driver: true,
+      evaluate_in_each_page: script,
+      add_match_block: add_match_block)
+  end
   let(:script) { nil }
   let(:body) { 'body' }
   let(:custom_add_match) do
@@ -28,16 +35,6 @@ RSpec.describe Grell::Crawler do
     it 'provides a stdout logger if nothing provided' do
       crawler
       expect(Grell.logger).to be_instance_of(Logger)
-    end
-  end
-
-  describe '#quit' do
-    let(:driver) { double }
-    before { allow(Grell::CapybaraDriver).to receive(:setup).and_return(driver) }
-
-    it 'quits the poltergeist driver' do
-      expect(driver).to receive(:quit)
-      crawler.quit
     end
   end
 
@@ -127,15 +124,6 @@ RSpec.describe Grell::Crawler do
       expect(result[1].url).to eq(url_visited)
     end
 
-    it 'can use a custom url add matcher block' do
-      expect(crawler).to_not receive(:default_add_match)
-      crawler.start_crawling(url, add_match_block: custom_add_match)
-    end
-
-    it 'uses a default url add matched if not provided' do
-      expect(crawler).to receive(:default_add_match).and_return(custom_add_match)
-      crawler.start_crawling(url)
-    end
   end
 
   shared_examples_for 'visits all available pages' do
