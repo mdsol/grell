@@ -5,7 +5,7 @@ module Grell
     # logger: logger to use for Grell's messages
     # on_periodic_restart: if set, the driver will restart every :each visits (100 default) and execute the :do block
     # driver_options: Any extra options for the Capybara driver
-    def initialize(logger: nil, on_periodic_restart: {}, driver: nil, **driver_options)
+    def initialize(logger: nil, on_periodic_restart: {}, driver: nil, driver_options: {})
       Grell.logger = logger ? logger : Logger.new(STDOUT)
       @periodic_restart_block = on_periodic_restart[:do]
       @periodic_restart_period = on_periodic_restart[:each] || PAGES_TO_RESTART

@@ -2,22 +2,28 @@ RSpec.describe Grell::CrawlerManager do
   let(:page) { Grell::Page.new(url, page_id, parent_page_id) }
   let(:host) { 'http://www.example.com' }
   let(:url) { 'http://www.example.com/test' }
-  let(:driver) { nil }
+  let(:driver) { double(Grell::CapybaraDriver) }
   let(:logger) { Logger.new(nil) }
   let(:crawler_manager) do
-    Grell::CrawlerManager.new(logger: logger, external_driver: true, driver: driver)
+    described_class.new(logger: logger, driver: driver)
   end
 
   describe 'initialize' do
-    it 'can provide your own logger' do
-      described_class.new(external_driver: true, logger: 33)
-      expect(Grell.logger).to eq(33)
-      Grell.logger = Logger.new(nil)
+    context 'provides a logger' do
+      let(:logger) { 33 }
+      it 'sets custom logger' do
+        crawler_manager
+        expect(Grell.logger).to eq(33)
+        Grell.logger = Logger.new(nil)
+      end
     end
-
-    it 'provides a stdout logger if no logger provided' do
-      described_class.new(external_driver: true)
-      expect(Grell.logger).to be_instance_of(Logger)
+    context 'does not provides a logger' do
+      let(:logger) { nil }
+      it 'sets default logger' do
+        crawler_manager
+        expect(Grell.logger).to be_instance_of(Logger)
+        Grell.logger = Logger.new(nil)
+      end
     end
   end
 
@@ -55,7 +61,6 @@ RSpec.describe Grell::CrawlerManager do
       let(:crawler_manager) do
         Grell::CrawlerManager.new(
           logger: logger,
-          external_driver: true,
           driver: driver,
           on_periodic_restart: { do: do_something }
         )
@@ -78,7 +83,6 @@ RSpec.describe Grell::CrawlerManager do
       let(:crawler_manager) do
         Grell::CrawlerManager.new(
           logger: logger,
-          external_driver: true,
           driver: driver,
           on_periodic_restart: { do: do_something, each: period }
         )

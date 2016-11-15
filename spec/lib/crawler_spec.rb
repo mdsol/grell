@@ -11,7 +11,7 @@ RSpec.describe Grell::Crawler do
   let(:crawler) do
     Grell::Crawler.new(
       logger: Logger.new(nil),
-      external_driver: true,
+      driver_options: { external_driver: true },
       evaluate_in_each_page: script,
       add_match_block: add_match_block,
       blacklist: blacklist,
@@ -27,19 +27,6 @@ RSpec.describe Grell::Crawler do
 
   before do
     proxy.stub(url).and_return(body: body, code: 200)
-  end
-
-  describe 'initialize' do
-    it 'can provide your own logger' do
-      Grell::Crawler.new(external_driver: true, logger: 33)
-      expect(Grell.logger).to eq(33)
-      Grell.logger = Logger.new(nil)
-    end
-
-    it 'provides a stdout logger if nothing provided' do
-      crawler
-      expect(Grell.logger).to be_instance_of(Logger)
-    end
   end
 
   describe '#crawl' do
