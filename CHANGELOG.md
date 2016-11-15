@@ -1,11 +1,12 @@
 # 2.0.0
-  * New configuration key `on_periodic_restart`
+  * New configuration key `on_periodic_restart`.
   * CrawlerManager.cleanup_all_processes method destroy all instances of phantomjs in this machine.
 
   * Breaking changes
-    - Requires Ruby 2.1 or superior
-    - Crawler.start_crawling does not accept options anymore, all options are passed to Crawler.new
-    - Crawler's methods `restart` and `quit` have been moved to CrawlerManager
+    - Requires Ruby 2.1 or later.
+    - Crawler.start_crawling does not accept options anymore, all options are passed to Crawler.new.
+    - Crawler's methods `restart` and `quit` have been moved to CrawlerManager.
+    - Crawler gets whitelist and blacklist as configuration options instead of being set in specific methods.
 
 # 1.6.11
   * Ensure all links are loaded by waiting for Ajax requests to complete

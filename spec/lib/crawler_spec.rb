@@ -6,12 +6,16 @@ RSpec.describe Grell::Crawler do
   let(:host) { 'http://www.example.com' }
   let(:url) { 'http://www.example.com/test' }
   let(:add_match_block) { nil }
+  let(:blacklist) { /a^/ }
+  let(:whitelist) { /.*/ }
   let(:crawler) do
     Grell::Crawler.new(
       logger: Logger.new(nil),
       external_driver: true,
       evaluate_in_each_page: script,
-      add_match_block: add_match_block)
+      add_match_block: add_match_block,
+      blacklist: blacklist,
+      whitelist: whitelist)
   end
   let(:script) { nil }
   let(:body) { 'body' }
@@ -192,10 +196,7 @@ RSpec.describe Grell::Crawler do
     end
 
     context 'using a single string' do
-      before do
-        crawler.whitelist('/trusmis.html')
-      end
-
+      let(:whitelist) { '/trusmis.html' }
       let(:visited_pages_count) { 2 } # my own page + trusmis
       let(:visited_pages) do
         ['http://www.example.com/test', 'http://www.example.com/trusmis.html']
@@ -205,10 +206,7 @@ RSpec.describe Grell::Crawler do
     end
 
     context 'using an array of strings' do
-      before do
-        crawler.whitelist(['/trusmis.html', '/nothere', 'another.html'])
-      end
-
+      let(:whitelist) { ['/trusmis.html', '/nothere', 'another.html'] }
       let(:visited_pages_count) { 2 }
       let(:visited_pages) do
         ['http://www.example.com/test', 'http://www.example.com/trusmis.html']
@@ -218,10 +216,7 @@ RSpec.describe Grell::Crawler do
     end
 
     context 'using a regexp' do
-      before do
-        crawler.whitelist(/\/trusmis\.html/)
-      end
-
+      let(:whitelist) { /\/trusmis\.html/ }
       let(:visited_pages_count) { 2 }
       let(:visited_pages) do
         ['http://www.example.com/test', 'http://www.example.com/trusmis.html']
@@ -231,10 +226,7 @@ RSpec.describe Grell::Crawler do
     end
 
     context 'using an array of regexps' do
-      before do
-        crawler.whitelist([/\/trusmis\.html/])
-      end
-
+      let(:whitelist) { [/\/trusmis\.html/] }
       let(:visited_pages_count) { 2 }
       let(:visited_pages) do
         ['http://www.example.com/test', 'http://www.example.com/trusmis.html']
@@ -244,10 +236,7 @@ RSpec.describe Grell::Crawler do
     end
 
     context 'using an empty array' do
-      before do
-        crawler.whitelist([])
-      end
-
+      let(:whitelist) { [] }
       let(:visited_pages_count) { 1 } # my own page only
       let(:visited_pages) do
         ['http://www.example.com/test']
@@ -257,10 +246,7 @@ RSpec.describe Grell::Crawler do
     end
 
     context 'adding all links to the whitelist' do
-      before do
-        crawler.whitelist(['/trusmis', '/help'])
-      end
-
+      let(:whitelist) { ['/trusmis', '/help'] }
       let(:visited_pages_count) { 3 } # all links
       let(:visited_pages) do
         ['http://www.example.com/test','http://www.example.com/trusmis.html', 'http://www.example.com/help.html']
@@ -286,9 +272,7 @@ RSpec.describe Grell::Crawler do
     end
 
     context 'using a single string' do
-      before do
-        crawler.blacklist('/trusmis.html')
-      end
+      let(:blacklist) { '/trusmis.html' }
       let(:visited_pages_count) {2}
       let(:visited_pages) do
         ['http://www.example.com/test','http://www.example.com/help.html']
@@ -298,9 +282,7 @@ RSpec.describe Grell::Crawler do
     end
 
     context 'using an array of strings' do
-      before do
-        crawler.blacklist(['/trusmis.html', '/nothere', 'another.html'])
-      end
+      let(:blacklist) { ['/trusmis.html', '/nothere', 'another.html'] }
       let(:visited_pages_count) {2}
       let(:visited_pages) do
         ['http://www.example.com/test','http://www.example.com/help.html']
@@ -310,9 +292,7 @@ RSpec.describe Grell::Crawler do
     end
 
     context 'using a regexp' do
-      before do
-        crawler.blacklist(/\/trusmis\.html/)
-      end
+      let(:blacklist) { /\/trusmis\.html/ }
       let(:visited_pages_count) {2}
       let(:visited_pages) do
         ['http://www.example.com/test','http://www.example.com/help.html']
@@ -322,9 +302,7 @@ RSpec.describe Grell::Crawler do
     end
 
     context 'using an array of regexps' do
-      before do
-        crawler.blacklist([/\/trusmis\.html/])
-      end
+      let(:blacklist) { [/\/trusmis\.html/] }
       let(:visited_pages_count) {2}
       let(:visited_pages) do
         ['http://www.example.com/test','http://www.example.com/help.html']
@@ -334,9 +312,7 @@ RSpec.describe Grell::Crawler do
     end
 
     context 'using an empty array' do
-      before do
-        crawler.blacklist([])
-      end
+      let(:blacklist) { [] }
       let(:visited_pages_count) { 3 } # all links
       let(:visited_pages) do
         ['http://www.example.com/test','http://www.example.com/trusmis.html', 'http://www.example.com/help.html']
@@ -345,10 +321,8 @@ RSpec.describe Grell::Crawler do
       it_behaves_like 'visits all available pages'
     end
 
-    context 'adding all links to the whitelist' do
-      before do
-        crawler.blacklist(['/trusmis', '/help'])
-      end
+    context 'adding all links to the blacklist' do
+      let(:blacklist) { ['/trusmis', '/help'] }
       let(:visited_pages_count) { 1 }
       let(:visited_pages) do
         ['http://www.example.com/test']
@@ -374,11 +348,8 @@ RSpec.describe Grell::Crawler do
     end
 
     context 'we blacklist the only whitelisted page' do
-      before do
-        crawler.whitelist('/trusmis.html')
-        crawler.blacklist('/trusmis.html')
-      end
-
+      let(:whitelist) { '/trusmis.html' }
+      let(:blacklist) { '/trusmis.html' }
       let(:visited_pages_count) { 1 }
       let(:visited_pages) do
         ['http://www.example.com/test']
@@ -388,11 +359,8 @@ RSpec.describe Grell::Crawler do
     end
 
     context 'we blacklist none of the whitelisted pages' do
-      before do
-        crawler.whitelist('/trusmis.html')
-        crawler.blacklist('/raistlin.html')
-      end
-
+      let(:whitelist) { '/trusmis.html' }
+      let(:blacklist) { '/raistlin.html' }
       let(:visited_pages_count) { 2 }
       let(:visited_pages) do
         ['http://www.example.com/test', 'http://www.example.com/trusmis.html']

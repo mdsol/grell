@@ -7,11 +7,15 @@ module Grell
     # evaluate_in_each_page: javascript block to evaluate in each page we crawl
     # add_match_block: block to evaluate to consider if a page is part of the collection
     # manager_options: options passed to the manager class
-    def initialize(evaluate_in_each_page: nil, add_match_block: nil, **manager_options)
+    # whitelist: Setups a whitelist filter, allows a regexp, string or array of either to be matched.
+    # blacklist: Setups a blacklist filter, allows a regexp, string or array of either to be matched.
+    def initialize(evaluate_in_each_page: nil, add_match_block: nil, whitelist: /.*/, blacklist: /a^/, **manager_options)
       @collection = nil
       @manager = CrawlerManager.new(manager_options)
       @evaluate_in_each_page = evaluate_in_each_page
       @add_match_block = add_match_block
+      @whitelist_regexp = Regexp.union(whitelist)
+      @blacklist_regexp = Regexp.union(blacklist)
     end
 
     # Main method, it starts crawling on the given URL and calls a block for each of the pages found.
@@ -44,18 +48,7 @@ module Grell
       end
     end
 
-    # Setups a whitelist filter, allows a regexp, string or array of either to be matched.
-    def whitelist(list)
-      @whitelist_regexp = Regexp.union(list)
-    end
-
-    # Setups a blacklist filter, allows a regexp, string or array of either to be matched.
-    def blacklist(list)
-      @blacklist_regexp = Regexp.union(list)
-    end
-
     private
-
 
     def crawl_site(site)
       site.navigate

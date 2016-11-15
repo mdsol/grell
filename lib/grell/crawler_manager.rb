@@ -3,13 +3,16 @@ module Grell
   # restarting and quiting the crawler correctly.
   class CrawlerManager
     # logger: logger to use for Grell's messages
-    # on_periodic_restart: if set, the driver will be restarted every :each visits (100 default), and execute the :do block
+    # on_periodic_restart: if set, the driver will restart every :each visits (100 default) and execute the :do block
     # driver_options: Any extra options for the Capybara driver
     def initialize(logger: nil, on_periodic_restart: {}, driver: nil, **driver_options)
       Grell.logger = logger ? logger : Logger.new(STDOUT)
       @periodic_restart_block = on_periodic_restart[:do]
       @periodic_restart_period = on_periodic_restart[:each] || PAGES_TO_RESTART
       @driver = driver || CapybaraDriver.setup(driver_options)
+      if @periodic_restart_period <= 0
+        Grell.logger.warn "GRELL being misconfigured with a negative period to restart. Ignoring option."
+      end
     end
 
     # Restarts the PhantomJS process without modifying the state of visited and discovered pages.
@@ -28,10 +31,11 @@ module Grell
     # PhantomJS seems to consume memory increasingly as it crawls, periodic restart allows to restart
     # the driver, potentially calling a block.
     def check_periodic_restart(collection)
-      if @periodic_restart_block && collection.visited_pages.size % @periodic_restart_period == 0
-        restart
-        @periodic_restart_block.call
-      end
+      return unless @periodic_restart_block
+      return unless @periodic_restart_period > 0
+      return unless (collection.visited_pages.size % @periodic_restart_period).zero?
+      restart
+      @periodic_restart_block.call
     end
 
     def cleanup_all_processes
@@ -45,8 +49,9 @@ module Grell
     end
 
     private
-    PAGES_TO_RESTART = 100.freeze # Default number of pages before we restart the driver.
-    KILL_TIMEOUT = 2.freeze       # Number of seconds we wait till we kill the process.
+
+    PAGES_TO_RESTART = 100  # Default number of pages before we restart the driver.
+    KILL_TIMEOUT = 2        # Number of seconds we wait till we kill the process.
 
     def running_phantomjs_pids
       list_phantomjs_processes_cmd = "ps -ef | grep -E 'bin/phantomjs' | grep -v grep"

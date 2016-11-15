@@ -40,12 +40,6 @@ RSpec.describe Grell::CrawlerManager do
       crawler_manager.restart
     end
   end
-  def check_periodic_restart(collection)
-    if @periodic_restart_block && collection.visited_pages.size % @periodic_restart_period == 0
-      restart
-      @periodic_restart_block.call
-    end
-  end
 
   describe '#check_periodic_restart' do
     let(:collection) { double }
@@ -57,13 +51,14 @@ RSpec.describe Grell::CrawlerManager do
       end
     end
     context 'Periodic restart setup with default period' do
-      let(:do_something) { Proc.new {} }
+      let(:do_something) { proc {} }
       let(:crawler_manager) do
         Grell::CrawlerManager.new(
           logger: logger,
           external_driver: true,
           driver: driver,
-          on_periodic_restart: { do: do_something })
+          on_periodic_restart: { do: do_something }
+        )
       end
 
       it 'does not restart after visiting 99 pages' do
@@ -78,14 +73,15 @@ RSpec.describe Grell::CrawlerManager do
       end
     end
     context 'Periodic restart setup with custom period' do
-      let(:do_something) { Proc.new {} }
+      let(:do_something) { proc {} }
       let(:period) { 50 }
       let(:crawler_manager) do
         Grell::CrawlerManager.new(
           logger: logger,
           external_driver: true,
           driver: driver,
-          on_periodic_restart: { do: do_something, each: period })
+          on_periodic_restart: { do: do_something, each: period }
+        )
       end
 
       it 'does not restart after visiting a number different from custom period pages' do
@@ -110,6 +106,4 @@ RSpec.describe Grell::CrawlerManager do
       crawler_manager.cleanup_all_processes
     end
   end
-
-
 end
