@@ -5,7 +5,7 @@ module Grell
   class CapybaraDriver
     include Capybara::DSL
 
-    USER_AGENT = "Mozilla/5.0 (Grell Crawler)"
+    USER_AGENT = "Mozilla/5.0 (Grell Crawler)".freeze
 
     def self.setup(options)
       new.setup_capybara unless options[:external_driver]

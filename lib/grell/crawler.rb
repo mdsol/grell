@@ -1,54 +1,32 @@
-
 module Grell
-
   # This is the class that starts and controls the crawling
   class Crawler
-    attr_reader :collection
+    attr_reader :collection, :manager
 
     # Creates a crawler
-    # options allows :logger to point to an object with the same interface than Logger in the standard library
-    def initialize(options = {})
-      if options[:logger]
-        Grell.logger = options[:logger]
-      else
-        Grell.logger = Logger.new(STDOUT)
-      end
-
-      @driver = CapybaraDriver.setup(options)
-      @evaluate_in_each_page = options[:evaluate_in_each_page]
-    end
-
-    # Restarts the PhantomJS process without modifying the state of visited and discovered pages.
-    def restart
-      Grell.logger.info "GRELL is restarting"
-      @driver.restart
-      Grell.logger.info "GRELL has restarted"
-    end
-
-    # Quits the poltergeist driver.
-    def quit
-      Grell.logger.info "GRELL is quitting the poltergeist driver"
-      @driver.quit
-    end
-
-    # Setups a whitelist filter, allows a regexp, string or array of either to be matched.
-    def whitelist(list)
-      @whitelist_regexp = Regexp.union(list)
-    end
-
-    # Setups a blacklist filter, allows a regexp, string or array of either to be matched.
-    def blacklist(list)
-      @blacklist_regexp = Regexp.union(list)
+    # evaluate_in_each_page: javascript block to evaluate in each page we crawl
+    # add_match_block: block to evaluate to consider if a page is part of the collection
+    # manager_options: options passed to the manager class
+    # whitelist: Setups a whitelist filter, allows a regexp, string or array of either to be matched.
+    # blacklist: Setups a blacklist filter, allows a regexp, string or array of either to be matched.
+    def initialize(evaluate_in_each_page: nil, add_match_block: nil, whitelist: /.*/, blacklist: /a^/, **manager_options)
+      @collection = nil
+      @manager = CrawlerManager.new(manager_options)
+      @evaluate_in_each_page = evaluate_in_each_page
+      @add_match_block = add_match_block
+      @whitelist_regexp = Regexp.union(whitelist)
+      @blacklist_regexp = Regexp.union(blacklist)
     end
 
     # Main method, it starts crawling on the given URL and calls a block for each of the pages found.
-    def start_crawling(url, options = {}, &block)
+    def start_crawling(url, &block)
       Grell.logger.info "GRELL Started crawling"
-      @collection = PageCollection.new(options[:add_match_block] || default_add_match)
+      @collection = PageCollection.new(@add_match_block)
       @collection.create_page(url, nil)
 
       while !@collection.discovered_pages.empty?
         crawl(@collection.next_page, block)
+        @manager.check_periodic_restart(@collection)
       end
 
       Grell.logger.info "GRELL finished crawling"
@@ -91,14 +69,6 @@ module Grell
     def filter!(links)
       links.select! { |link| link =~ @whitelist_regexp } if @whitelist_regexp
       links.delete_if { |link| link =~ @blacklist_regexp } if @blacklist_regexp
-    end
-
-    # If options[:add_match_block] is not provided, url matching to determine if a
-    # new page should be added the page collection will default to this proc
-    def default_add_match
-      Proc.new do |collection_page, page|
-        collection_page.url.downcase == page.url.downcase
-      end
     end
 
     # Store the resulting redirected URL along with the original URL
