@@ -11,7 +11,7 @@ RSpec.describe Grell::Crawler do
   let(:crawler) do
     Grell::Crawler.new(
       logger: Logger.new(nil),
-      driver_options: { external_driver: true },
+      driver: double(nil),
       evaluate_in_each_page: script,
       add_match_block: add_match_block,
       blacklist: blacklist,

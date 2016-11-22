@@ -1,3 +1,7 @@
+# 2.1.0
+  * Delete `driver_options` configuration key as it was never used.
+  * `cleanup_all_processes` is a self method as intended to.
+
 # 2.0.0
   * New configuration key `on_periodic_restart`.
   * CrawlerManager.cleanup_all_processes method destroy all instances of phantomjs in this machine.

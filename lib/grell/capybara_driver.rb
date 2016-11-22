@@ -1,16 +1,10 @@
-
 module Grell
-
-  #The driver for Capybara. It uses Portelgeist to control PhantomJS
+  # This class setups the driver for capybara. Used internally by the CrawlerManager
+  # It uses Portelgeist to control PhantomJS
   class CapybaraDriver
-    include Capybara::DSL
-
     USER_AGENT = "Mozilla/5.0 (Grell Crawler)".freeze
 
-    def self.setup(options)
-      new.setup_capybara unless options[:external_driver]
-    end
-
+    # Returns a poltergeist driver
     def setup_capybara
       @poltergeist_driver = nil
 
@@ -20,18 +14,17 @@ module Grell
       Grell.logger.info "GRELL Registering poltergeist driver with name '#{driver_name}'"
 
       Capybara.register_driver driver_name do |app|
-        @poltergeist_driver = Capybara::Poltergeist::Driver.new(app, {
+        @poltergeist_driver = Capybara::Poltergeist::Driver.new(app,
           js_errors: false,
           inspector: false,
           phantomjs_logger: FakePoltergeistLogger,
-          phantomjs_options: ['--debug=no', '--load-images=no', '--ignore-ssl-errors=yes', '--ssl-protocol=TLSv1']
-         })
+          phantomjs_options: ['--debug=no', '--load-images=no', '--ignore-ssl-errors=yes', '--ssl-protocol=TLSv1'])
       end
 
       Capybara.default_max_wait_time = 3
       Capybara.run_server = false
       Capybara.default_driver = driver_name
-      page.driver.headers = {
+      Capybara.current_session.driver.headers = { # The driver gets initialized when modified here
         "DNT" => 1,
         "User-Agent" => USER_AGENT
       }
@@ -41,14 +34,11 @@ module Grell
       @poltergeist_driver
     end
 
-    def quit
-      @poltergeist_driver.quit
-    end
-
+    # Poltergeist driver needs a class with this signature. The javascript console.log is sent here.
+    # We just discard that information.
     module FakePoltergeistLogger
       def self.puts(*)
       end
     end
   end
-
 end

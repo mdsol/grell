@@ -96,7 +96,6 @@ The `Grell:Crawler` class can be passed options to customize its behavior:
 - `blacklist`: Setups a blacklist filter for URLs to be avoided. Default: no URL is blacklisted.
 - `add_match_block`: Block evaluated to consider if a given page should be part of the pages to be visited. Default: add unique URLs.
 - `evaluate_in_each_page`: Javascript block to be evaluated on each page visited. Default: Nothing evaluated.
-- `driver_options`: Driver options will be passed to the Capybara driver which connects to PhantomJS.
 
 Grell by default will follow all the links it finds in the site being crawled.
 It will never follow links linking outside your site.

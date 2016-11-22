@@ -1,6 +1,9 @@
 
 RSpec.describe Grell::CapybaraDriver do
   let(:ts) { Time.now }
+  before do
+    Grell.logger = Logger.new(nil)
+  end
 
   describe 'setup_capybara' do
     it 'properly registers the poltergeist driver' do
@@ -22,14 +25,6 @@ RSpec.describe Grell::CapybaraDriver do
       Timecop.freeze(ts + 120)
       driver = Grell::CapybaraDriver.new.setup_capybara
       expect(driver).to be_instance_of(Capybara::Poltergeist::Driver)
-    end
-  end
-
-  describe 'quit' do
-    let(:driver) { Grell::CapybaraDriver.new.setup_capybara }
-    it 'quits the poltergeist driver' do
-      expect_any_instance_of(Capybara::Poltergeist::Driver).to receive(:quit)
-      driver.quit
     end
   end
 
