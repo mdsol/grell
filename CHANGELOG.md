@@ -1,3 +1,6 @@
+# 2.1.1
+  * Update phantomjs_options to use 'TLSv1.2'
+
 # 2.1.0
   * Delete `driver_options` configuration key as it was never used.
   * `cleanup_all_processes` is a self method as intended to.
