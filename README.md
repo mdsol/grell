@@ -92,15 +92,15 @@ crawler.manager.quit # quits and destroys the crawler
 The `Grell:Crawler` class can be passed options to customize its behavior:
 - `logger`: Sets the logger object, for instance `Rails.logger`. Default: `Logger.new(STDOUT)`
 - `on_periodic_restart`: Sets periodic restarts of the crawler each certain number of visits. Default: 100 pages.
-- `whitelist`: Setups a whitelist filter for URLs to be visited. Default: all URLs are whitelisted.
-- `blacklist`: Setups a blacklist filter for URLs to be avoided. Default: no URL is blacklisted.
+- `allowlist`: Sets a allowlist filter for URLs to be visited. Default: all URLs are allowlisted.
+- `denylist`: Sets a denylist filter for URLs to be avoided. Default: no URL is denylisted.
 - `add_match_block`: Block evaluated to consider if a given page should be part of the pages to be visited. Default: add unique URLs.
 - `evaluate_in_each_page`: Javascript block to be evaluated on each page visited. Default: Nothing evaluated.
 
 Grell by default will follow all the links it finds in the site being crawled.
 It will never follow links linking outside your site.
 If you want to further limit the amount of links crawled, you can use
-whitelisting, blacklisting or manual filtering.
+allowlisting, denylisting or manual filtering.
 Below further details on these and other options.
 
 
@@ -123,32 +123,32 @@ The crawler can be restarted manually by calling `crawler.manager.restart` or au
  between restarts. A restart will destroy the cookies so for instance this custom block can be used to relogin.
 
 
- #### Whitelisting
+ #### Allowlisting
 
  ```ruby
  require 'grell'
 
- crawler = Grell::Crawler.new(whitelist: [/games\/.*/, '/fun'])
+ crawler = Grell::Crawler.new(allowlist: [/games\/.*/, '/fun'])
  crawler.start_crawling('http://www.google.com')
  ```
 
  Grell here will only follow links to games and '/fun' and ignore all
  other links. You can provide a regexp, strings (if any part of the
- string match is whitelisted) or an array with regexps and/or strings.
+ string match is allowlisted) or an array with regexps and/or strings.
 
- #### Blacklisting
+ #### Denylisting
 
  ```ruby
  require 'grell'
 
- crawler = Grell::Crawler.new(blacklist: /games\/.*/)
+ crawler = Grell::Crawler.new(denylist: /games\/.*/)
  crawler.start_crawling('http://www.google.com')
  ```
 
- Similar to whitelisting. But now Grell will follow every other link in
+ Similar to allowlisting. But now Grell will follow every other link in
  this site which does not go to /games/...
 
- If you call both whitelist and blacklist then both will apply, a link
+ If you call both allowlist and denylist then both will apply, a link
  has to fullfill both conditions to survive. If you do not call any, then
  all links on this site will be crawled. Think of these methods as
  filters.

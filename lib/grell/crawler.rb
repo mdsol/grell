@@ -7,15 +7,15 @@ module Grell
     # evaluate_in_each_page: javascript block to evaluate in each page we crawl
     # add_match_block: block to evaluate to consider if a page is part of the collection
     # manager_options: options passed to the manager class
-    # whitelist: Setups a whitelist filter, allows a regexp, string or array of either to be matched.
-    # blacklist: Setups a blacklist filter, allows a regexp, string or array of either to be matched.
-    def initialize(evaluate_in_each_page: nil, add_match_block: nil, whitelist: /.*/, blacklist: /a^/, **manager_options)
+    # allowlist: Sets an allowlist filter, allows a regexp, string or array of either to be matched.
+    # denylist: Sets a denylist filter, allows a regexp, string or array of either to be matched.
+    def initialize(evaluate_in_each_page: nil, add_match_block: nil, allowlist: /.*/, denylist: /a^/, **manager_options)
       @collection = nil
       @manager = CrawlerManager.new(manager_options)
       @evaluate_in_each_page = evaluate_in_each_page
       @add_match_block = add_match_block
-      @whitelist_regexp = Regexp.union(whitelist)
-      @blacklist_regexp = Regexp.union(blacklist)
+      @allowlist_regexp = Regexp.union(allowlist)
+      @denylist_regexp = Regexp.union(denylist)
     end
 
     # Main method, it starts crawling on the given URL and calls a block for each of the pages found.
@@ -67,8 +67,8 @@ module Grell
     end
 
     def filter!(links)
-      links.select! { |link| link =~ @whitelist_regexp } if @whitelist_regexp
-      links.delete_if { |link| link =~ @blacklist_regexp } if @blacklist_regexp
+      links.select! { |link| link =~ @allowlist_regexp } if @allowlist_regexp
+      links.delete_if { |link| link =~ @denylist_regexp } if @denylist_regexp
     end
 
     # Store the resulting redirected URL along with the original URL
