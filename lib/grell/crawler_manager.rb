@@ -70,7 +70,7 @@ module Grell
       rescue Errno::ESRCH, Errno::ECHILD
         # successfully terminated
       rescue => e
-        Grell.logger.exception e, "GRELL. PhantomJS process could not be killed"
+        Grell.logger.error ["GRELL. PhantomJS process could not be killed", e.message, *e.backtrace].join($/)
       end
 
       def force_kill(pid)
