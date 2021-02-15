@@ -1,3 +1,6 @@
+# 2.1.2
+  * Change white/black lists to allow/deny lists
+
 # 2.1.1
   * Update phantomjs_options to use 'TLSv1.2'
 
